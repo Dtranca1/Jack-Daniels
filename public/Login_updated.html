@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Webapp Login</title>
+    <link rel="stylesheet" type="text/css" href="/itwp1000/Homework6/styles3.css">
+</head>
+
+<body>
+    <header>
+        <h1>Webapp</h1>
+        <p>Log in to continue.</p>
+    </header>
+
+    <main>
+        <section>
+            <form id="login" name="login" method="post"
+                  action="https://webdevbasics.net/scripts/demo.php"
+                  enctype="application/x-www-form-urlencoded">
+
+                <fieldset>
+                    <legend><strong>Login</strong></legend>
+
+                    <p>
+                        <label for="email">Email:</label><br>
+                        <input type="email" name="email" id="email"
+                               size="30" placeholder="Email Address"
+                               autocomplete="username" required>
+                    </p>
+
+                    <p>
+                        <label for="password">Password:</label><br>
+                        <input type="password" name="password" id="password"
+                               size="30" placeholder="Password"
+                               autocomplete="current-password" required>
+                    </p>
+
+                    <p>
+                        <input id="submit" type="submit" value="Login">
+                        <input id="reset" type="reset" value="Reset">
+                    </p>
+                </fieldset>
+            </form>
+        </section>
+    </main>
+
+    <footer>
+        <p id="validation">
+            <a href="https://validator.w3.org/nu/" title="HTML5 Validation">
+                HTML5 Validation
+            </a>
+        </p>
+    </footer>
+</body>
+</html>
