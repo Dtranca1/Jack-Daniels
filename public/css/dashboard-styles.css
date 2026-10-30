@@ -1,0 +1,232 @@
+:root {
+    --ink: #303030;
+    --panel: #898989;
+    --line: #444;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    width: 100%;
+    height: 100%;
+    min-height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+  }
+
+  body {
+    font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
+    background: var(--panel);
+  }
+
+  .dashboard {
+    width: 100%;
+    height: 100vh;
+    height: 100dvh;
+    min-height: 0;
+    display: grid;
+    grid-template-columns: 150px minmax(0, 1fr);
+    grid-template-rows: 100px minmax(0, 1fr);
+    overflow: hidden;
+    border-radius: 0;
+    background: var(--panel);
+    color: #fff;
+  }
+
+  .topbar {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    gap: 22px;
+    width: 100%;
+    min-width: 0;
+    padding: 15px 35px;
+    background: var(--ink);
+    border-bottom: 3px solid #666;
+  }
+
+  .avatar {
+    width: 82px;
+    height: 58px;
+    flex: 0 0 auto;
+    background: #fff;
+    border-radius: 50%;
+  }
+
+  .username, .date {
+    color: #fff;
+    font-size: clamp(20px, 2.3vw, 32px);
+    font-weight: 900;
+    line-height: 1;
+  }
+
+  .date {
+    margin-left: auto;
+    white-space: nowrap;
+  }
+
+  .sidebar {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    padding: 10px 18px 100px;
+    background: var(--ink);
+    border-right: 3px solid #666;
+  }
+
+  .color-tab {
+    width: 100%;
+    max-width: 112px;
+    height: 40px;
+    border-radius: 20px;
+    flex: 0 0 auto;
+  }
+
+  .red { background: #f02e32; }
+  .blue { background: #303fe8; }
+  .yellow { background: #f1ed2d; }
+
+  .add-control {
+    position: absolute;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .add-button {
+    position: relative;
+    width: 72px;
+    height: 68px;
+    display: grid;
+    place-items: center;
+    border: 0;
+    border-radius: 50%;
+    background: #929292;
+    color: #303030;
+  }
+
+  .add-button::before,
+  .add-button::after {
+    content: "";
+    position: absolute;
+    background: #303030;
+    border-radius: 3px;
+  }
+
+  .add-button::before { width: 48px; height: 7px; }
+  .add-button::after { width: 7px; height: 48px; }
+
+  .add-menu {
+    display: none;
+    position: absolute;
+    z-index: 5;
+    left: calc(100% + 18px);
+    bottom: 0;
+    width: 150px;
+    min-height: 110px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    padding: 8px 12px;
+    color: #fff;
+    background: #303030;
+    border: 0;
+    border-radius: 42px;
+    font-size: 29px;
+    font-weight: 900;
+    box-shadow: 0 4px 12px rgba(0,0,0,.15);
+  }
+
+  .add-menu::before {
+    content: "";
+    position: absolute;
+    width: 54px;
+    height: 16px;
+    left: -43px;
+    bottom: 38px;
+    z-index: -1;
+    background: #555;
+    transform: rotate(-12deg);
+  }
+
+  .add-menu.show { display: flex; }
+  .add-menu:hover, .add-menu:focus { color: #fff; background: #242424; }
+
+  .workspace {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    min-width: 0;
+    min-height: 0;
+    padding: 40px;
+    overflow: auto;
+    background: var(--panel);
+  }
+
+  .calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    grid-template-rows: repeat(5, minmax(60px, 1fr));
+    width: 100%;
+    min-height: 100%;
+    background: #fff;
+    border-top: 1px solid var(--line);
+    border-left: 1px solid var(--line);
+  }
+
+  .calendar-cell {
+    border-right: 2px solid var(--line);
+    border-bottom: 1px solid #666;
+    background: #fff;
+  }
+
+  .calendar-cell:nth-child(7n) { border-right: 0; }
+
+  @media (max-width: 700px) {
+    .dashboard {
+      grid-template-columns: 78px minmax(0, 1fr);
+      grid-template-rows: 80px minmax(0, 1fr);
+    }
+
+    .topbar { padding: 12px; gap: 10px; }
+    .avatar { width: 46px; height: 40px; }
+    .username, .date { font-size: clamp(14px, 3vw, 22px); }
+
+    .sidebar { padding: 10px 8px 80px; gap: 12px; }
+    .color-tab { height: 28px; }
+    .add-control { bottom: 30px; }
+
+    .add-button { width: 48px; height: 46px; }
+    .add-button::before { width: 32px; height: 5px; }
+    .add-button::after { width: 5px; height: 32px; }
+
+    .add-menu {
+      left: calc(100% + 12px);
+      width: 100px;
+      min-height: 78px;
+      border-radius: 28px;
+      font-size: 22px;
+    }
+
+    .add-menu::before {
+      width: 38px;
+      left: -30px;
+      bottom: 28px;
+      height: 12px;
+    }
+
+    .workspace { padding: 20px 12px; }
+    .calendar-grid { grid-template-rows: repeat(5, minmax(45px, 1fr)); }
+    .calendar-cell { border-right-width: 1px; }
+  }
+
+  @media (max-width: 420px) {
+    .date { font-size: 13px; }
+    .topbar { gap: 8px; }
+    .workspace { padding-left: 8px; padding-right: 8px; }
+  }
