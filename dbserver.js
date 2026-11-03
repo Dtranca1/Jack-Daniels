@@ -2,7 +2,8 @@
 const {DatabaseSync} = require("node:sqlite");
 //opens SQL Databse file names remindme.db
 //if it doesn't exist it will create a new one
-const db = new DatabaseSync("./remindme.db");
+const path = require('path');
+const db = new DatabaseSync(path.join(__dirname, 'remindme.db'));  // absolute path since it would make a new db in /backend, we want it in root dir
 
 //makes sqlite enforce relationships
 db.exec("PRAGMA foreign_keys = ON;");
