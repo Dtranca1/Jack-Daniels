@@ -141,3 +141,6 @@ db.exec(`
         FOREIGN KEY (cID) REFERENCES Category(cID)
     )
 `);
+
+// export db connection so other files can use it
+module.exports = db;
