@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Webapp Registration</title>
+    <link rel="stylesheet" type="text/css" href="styles3.css">
+</head>
+
+<body>
+    <header>
+        <h1>Webapp</h1>
+        <p>Create an account to get started.</p>
+    </header>
+
+    <main>
+        <section>
+            <form id="registration" name="registration">
+                <fieldset>
+                    <legend><strong>Create Account</strong></legend>
+
+                    <p>
+                        <label for="email">Email:</label><br>
+                        <input type="email" name="email" id="email"
+                               size="30" placeholder="Email Address"
+                               autocomplete="email" required>
+                    </p>
+
+                    <p>
+                        <label for="password">Password:</label><br>
+                        <input type="password" name="password" id="password"
+                               size="30" placeholder="Create a Password"
+                               autocomplete="new-password"
+                               minlength="8" required>
+                    </p>
+
+                    <p>
+                        <label for="confirm-password">Confirm Password:</label><br>
+                        <input type="password" id="confirm-password"
+                               size="30" placeholder="Re-enter Password"
+                               autocomplete="new-password"
+                               minlength="8" required>
+                    </p>
+
+                    <p>
+                        <input id="submit" type="submit" value="Register">
+                        <input id="reset" type="reset" value="Reset">
+                    </p>
+
+                    <p>Already have an account? <a href="Login_updated.html">Log in</a>.</p>
+                    <p id="form-message" role="status" aria-live="polite"></p>
+                </fieldset>
+            </form>
+        </section>
+    </main>
+
+    <footer>
+        <p id="validation">
+            <a href="https://validator.w3.org/nu/" title="HTML5 Validation">
+                HTML5 Validation
+            </a>
+        </p>
+    </footer>
+
+    <script>
+        const registrationForm = document.getElementById("registration");
+
+        registrationForm.addEventListener("submit", async function (event) {
+            event.preventDefault();
+
+            const email = document.getElementById("email").value.trim();
+            const password = document.getElementById("password").value;
+            const confirmPassword = document.getElementById("confirm-password").value;
+            const submitButton = document.getElementById("submit");
+            const message = document.getElementById("form-message");
+
+            message.textContent = "";
+
+            if (password !== confirmPassword) {
+                message.textContent = "The passwords do not match.";
+                document.getElementById("confirm-password").focus();
+                return;
+            }
+
+            submitButton.disabled = true;
+            submitButton.value = "Registering...";
+
+            try {
+                const response = await fetch("http://localhost:3000/api/auth/register", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        email: email,
+                        Password: password
+                    })
+                });
+
+                const result = await response.json().catch(() => ({}));
+
+                if (!response.ok) {
+                    throw new Error(result.message || "Registration failed. Please try again.");
+                }
+
+                message.textContent = result.message || "Account created successfully. You can now log in.";
+                registrationForm.reset();
+            } catch (error) {
+                message.textContent = error.message || "Could not connect to the registration server.";
+            } finally {
+                submitButton.disabled = false;
+                submitButton.value = "Register";
+            }
+        });
+    </script>
+</body>
+</html>

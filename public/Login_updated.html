@@ -15,9 +15,7 @@
 
     <main>
         <section>
-            <form id="login" name="login" method="post"
-                  action="https://webdevbasics.net/scripts/demo.php"
-                  enctype="application/x-www-form-urlencoded">
+            <form id="login" name="login">
 
                 <fieldset>
                     <legend><strong>Login</strong></legend>
@@ -52,5 +50,47 @@
             </a>
         </p>
     </footer>
+
+    <script>
+        const loginForm = document.getElementById("login");
+
+        loginForm.addEventListener("submit", async function (event) {
+            event.preventDefault();
+
+            const email = document.getElementById("email").value;
+            const password = document.getElementById("password").value;
+            const submitButton = document.getElementById("submit");
+
+            submitButton.disabled = true;
+            submitButton.value = "Logging in...";
+
+            try {
+                const response = await fetch("http://localhost:3000/api/auth/login", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        email: email,
+                        Password: password
+                    })
+                });
+
+                const result = await response.json().catch(() => ({}));
+
+                if (!response.ok) {
+                    throw new Error(result.message || "Login failed. Check your email and password.");
+                }
+
+                alert(result.message || "Login successful!");
+            } catch (error) {
+                alert(error.message || "Could not connect to the login server.");
+            } finally {
+                submitButton.disabled = false;
+                submitButton.value = "Login";
+            }
+        });
+    </script>
+
 </body>
 </html>
