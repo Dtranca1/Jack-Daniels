@@ -141,3 +141,22 @@ db.exec(`
         FOREIGN KEY (cID) REFERENCES Category(cID)
     )
 `);
+
+// test if all five tables are made 
+const tables = db.prepare(`
+   SELECT name 
+   FROM sqlite_master
+   where type  = 'table'
+   AND name not like 'sqlite_%'
+  ` ).all();
+
+console.log(tables);
+
+//Insert a user 
+const aUser = db.prepare(`
+    INSERT INTO User (firstN,LastN,email,passH)
+    VALUES (?,?,?,?)
+     `);
+
+aUser.run("Michael", "Camaj","michaelcamaj@oakland.edu","test_hash");
+console.log("User added success!");
