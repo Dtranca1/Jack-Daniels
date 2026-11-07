@@ -6,6 +6,7 @@
   <title>Dashboard Mockup</title>
   <link href="../public/css/bootstrap.min.css" rel="stylesheet">
   <link href="../public/css/dashboard-styles.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
 </head>
 <body>
   <main class="dashboard" aria-label="Calendar dashboard mockup">
@@ -24,13 +25,7 @@
       </div>
     </aside>
     <section class="workspace" aria-label="Calendar grid">
-      <div class="calendar-grid" role="grid" aria-label="Blank calendar">
-        <div class="calendar-cell" role="gridcell"></div><div class="calendar-cell" role="gridcell"></div><div class="calendar-cell" role="gridcell"></div><div class="calendar-cell" role="gridcell"></div><div class="calendar-cell" role="gridcell"></div><div class="calendar-cell" role="gridcell"></div><div class="calendar-cell" role="gridcell"></div>
-        <div class="calendar-cell" role="gridcell"></div><div class="calendar-cell" role="gridcell"></div><div class="calendar-cell" role="gridcell"></div><div class="calendar-cell" role="gridcell"></div><div class="calendar-cell" role="gridcell"></div><div class="calendar-cell" role="gridcell"></div><div class="calendar-cell" role="gridcell"></div>
-        <div class="calendar-cell" role="gridcell"></div><div class="calendar-cell" role="gridcell"></div><div class="calendar-cell" role="gridcell"></div><div class="calendar-cell" role="gridcell"></div><div class="calendar-cell" role="gridcell"></div><div class="calendar-cell" role="gridcell"></div><div class="calendar-cell" role="gridcell"></div>
-        <div class="calendar-cell" role="gridcell"></div><div class="calendar-cell" role="gridcell"></div><div class="calendar-cell" role="gridcell"></div><div class="calendar-cell" role="gridcell"></div><div class="calendar-cell" role="gridcell"></div><div class="calendar-cell" role="gridcell"></div><div class="calendar-cell" role="gridcell"></div>
-        <div class="calendar-cell" role="gridcell"></div><div class="calendar-cell" role="gridcell"></div><div class="calendar-cell" role="gridcell"></div><div class="calendar-cell" role="gridcell"></div><div class="calendar-cell" role="gridcell"></div><div class="calendar-cell" role="gridcell"></div><div class="calendar-cell" role="gridcell"></div>
-      </div>
+      <div id="calendar"></div>
     </section>
   </main>
   <script>
@@ -51,6 +46,38 @@
       addToggle.setAttribute('aria-expanded', 'false');
       // Add your create-new-item action here.
     });
+
+    const calendar = new FullCalendar.Calendar(document.getElementById('calendar'), {
+      initialView: 'dayGridMonth',
+      initialDate: '2026-10-01',
+      headerToolbar: {
+        left: 'prev,next today',
+        center: 'title',
+        right: 'dayGridMonth,timeGridWeek,listWeek'
+      },
+      events: [
+        {
+          title: 'Red Task',
+          start: '2026-10-05',
+          backgroundColor: '#f02e32',
+          borderColor: '#f02e32'
+        },
+        {
+          title: 'Blue Task',
+          start: '2026-10-12',
+          backgroundColor: '#303fe8',
+          borderColor: '#303fe8'
+        },
+        {
+          title: 'Yellow Task',
+          start: '2026-10-18',
+          backgroundColor: '#f1ed2d',
+          borderColor: '#f1ed2d',
+          textColor: '#303030'
+        }
+      ]
+    });
+    calendar.render();
   </script>
 </body>
 </html>
