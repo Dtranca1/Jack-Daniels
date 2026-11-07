@@ -16,7 +16,6 @@
     <main>
         <section>
             <form id="login" name="login">
-
                 <fieldset>
                     <legend><strong>Login</strong></legend>
 
@@ -38,6 +37,8 @@
                         <input id="submit" type="submit" value="Login">
                         <input id="reset" type="reset" value="Reset">
                     </p>
+                    <p>Don't have an account? <a href="Registration.html">Register</a>.</p>
+                    <p id="login-message" role="status" aria-live="polite"></p>
                 </fieldset>
             </form>
         </section>
@@ -49,19 +50,20 @@
                 HTML5 Validation
             </a>
         </p>
-        <p>Don't have an account? <a href="Registration.html">Register</a>.</p>
     </footer>
-    <!-- JavaScript for handling login form submission -->
+
     <script>
         const loginForm = document.getElementById("login");
 
         loginForm.addEventListener("submit", async function (event) {
             event.preventDefault();
 
-            const email = document.getElementById("email").value;
+            const email = document.getElementById("email").value.trim();
             const password = document.getElementById("password").value;
             const submitButton = document.getElementById("submit");
+            const message = document.getElementById("login-message");
 
+            message.textContent = "";
             submitButton.disabled = true;
             submitButton.value = "Logging in...";
 
@@ -83,15 +85,14 @@
                     throw new Error(result.message || "Login failed. Check your email and password.");
                 }
 
-                alert(result.message || "Login successful!");
+                // Redirect only after the server confirms a successful login.
+                window.location.href = "dashboard.html";
             } catch (error) {
-                alert(error.message || "Could not connect to the login server.");
-            } finally {
+                message.textContent = error.message || "Could not connect to the login server.";
                 submitButton.disabled = false;
                 submitButton.value = "Login";
             }
         });
     </script>
-
 </body>
 </html>
