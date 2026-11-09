@@ -3,49 +3,118 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Dashboard Mockup</title>
+  <title>Calendar Dashboard</title>
   <link href="../public/css/bootstrap.min.css" rel="stylesheet">
   <link href="../public/css/dashboard-styles.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
 </head>
 <body>
-  <main class="dashboard" aria-label="Calendar dashboard mockup">
+  <main class="dashboard" aria-label="Calendar dashboard">
     <header class="topbar">
       <div class="avatar" aria-label="User profile placeholder"></div>
       <div class="username">Username</div>
-      <div class="date">10/31/2026</div>
+      <div class="date" id="todayDate"></div>
     </header>
-    <aside class="sidebar" aria-label="Color categories">
-      <div class="color-tab red" title="Red category"></div>
-      <div class="color-tab blue" title="Blue category"></div>
-      <div class="color-tab yellow" title="Yellow category"></div>
+
+    <aside class="sidebar" aria-label="Calendar events">
+      <section class="sidebar-events" aria-labelledby="sidebarEventsHeading">
+        <h2 id="sidebarEventsHeading">Events</h2>
+        <div class="event-list" id="eventList" aria-live="polite">
+          <p class="no-events">No events scheduled.</p>
+        </div>
+      </section>
+
       <div class="add-control">
-        <button class="add-button btn p-0" id="addToggle" type="button" aria-label="Open create menu" aria-expanded="false" aria-controls="addMenu"></button>
+        <button class="add-button btn p-0" id="addToggle" type="button"
+          aria-label="Open create menu" aria-expanded="false" aria-controls="addMenu"></button>
         <button class="add-menu btn" id="addMenu" type="button" aria-label="Create new item">New</button>
       </div>
     </aside>
-    <section class="workspace" aria-label="Calendar grid">
+
+    <section class="workspace" aria-label="Calendar">
       <div id="calendar"></div>
     </section>
   </main>
+
   <script>
     const addToggle = document.getElementById('addToggle');
     const addMenu = document.getElementById('addMenu');
+    const eventList = document.getElementById('eventList');
+
+    document.getElementById('todayDate').textContent =
+      new Date().toLocaleDateString();
+
     addToggle.addEventListener('click', () => {
       const isOpen = addMenu.classList.toggle('show');
       addToggle.setAttribute('aria-expanded', String(isOpen));
     });
+
     document.addEventListener('click', (event) => {
       if (!event.target.closest('.add-control')) {
         addMenu.classList.remove('show');
         addToggle.setAttribute('aria-expanded', 'false');
       }
     });
-    addMenu.addEventListener('click', () => {
-      addMenu.classList.remove('show');
-      addToggle.setAttribute('aria-expanded', 'false');
-      // Add your create-new-item action here.
-    });
+
+    function formatEventDate(event) {
+      if (event.allDay) {
+        return event.start.toLocaleDateString(undefined, {
+          month: 'short', day: 'numeric', year: 'numeric'
+        });
+      }
+      return event.start.toLocaleString(undefined, {
+        month: 'short', day: 'numeric', year: 'numeric',
+        hour: 'numeric', minute: '2-digit'
+      });
+    }
+
+    function renderSidebarEvents(events) {
+      eventList.replaceChildren();
+
+      const sortedEvents = [...events].sort((a, b) =>
+        (a.start ? a.start.getTime() : 0) - (b.start ? b.start.getTime() : 0)
+      );
+
+      if (sortedEvents.length === 0) {
+        const emptyMessage = document.createElement('p');
+        emptyMessage.className = 'no-events';
+        emptyMessage.textContent = 'No events scheduled.';
+        eventList.appendChild(emptyMessage);
+        return;
+      }
+
+      sortedEvents.forEach((event) => {
+        const eventButton = document.createElement('button');
+        eventButton.type = 'button';
+        eventButton.className = 'sidebar-event';
+        eventButton.style.setProperty(
+          '--event-color',
+          event.backgroundColor || event.borderColor || '#777'
+        );
+        eventButton.setAttribute('aria-label',
+          `${event.title}, ${event.start ? formatEventDate(event) : 'date not set'}`
+        );
+
+        const title = document.createElement('span');
+        title.className = 'sidebar-event-title';
+        title.textContent = event.title;
+
+        const date = document.createElement('span');
+        date.className = 'sidebar-event-date';
+        date.textContent = event.start ? formatEventDate(event) : 'Date not set';
+
+        eventButton.append(title, date);
+        eventButton.addEventListener('click', () => {
+          if (event.start) {
+            calendar.gotoDate(event.start);
+            calendar.changeView('dayGridMonth');
+          }
+          eventButton.blur();
+        });
+
+        eventList.appendChild(eventButton);
+      });
+    }
 
     const calendar = new FullCalendar.Calendar(document.getElementById('calendar'), {
       initialView: 'dayGridMonth',
@@ -75,9 +144,33 @@
           borderColor: '#f1ed2d',
           textColor: '#303030'
         }
-      ]
+      ],
+      eventsSet: renderSidebarEvents
     });
+
     calendar.render();
+
+    addMenu.addEventListener('click', () => {
+      addMenu.classList.remove('show');
+      addToggle.setAttribute('aria-expanded', 'false');
+
+      const title = prompt('What is the event called?');
+      if (!title || !title.trim()) return;
+
+      const date = prompt('What date? Use YYYY-MM-DD (for example, 2026-11-15).');
+      if (!date || !/^\\d{4}-\\d{2}-\\d{2}$/.test(date)) {
+        alert('Please enter the date in YYYY-MM-DD format.');
+        return;
+      }
+
+      calendar.addEvent({
+        title: title.trim(),
+        start: date,
+        allDay: true,
+        backgroundColor: '#303fe8',
+        borderColor: '#303fe8'
+      });
+    });
   </script>
 </body>
 </html>
