@@ -36,4 +36,50 @@ router.post('/create', (req, res) => {
     }
 });
 
+// update existing category
+router.put('/update/:cID', (req, res) => {
+    const { cID } = req.params;
+    const { name, colorCat } = req.body;
+
+    if (!name) {
+        return res.status(400).json({ error: "Category name is required for updates" });
+    }
+
+    try {
+        const query = `
+            UPDATE Category 
+            SET name = ?, colorCat = ? 
+            WHERE cID = ?
+        `;
+        const stmt = db.prepare(query);
+        const result = stmt.run(name, colorCat || null, cID);
+
+        if (result.changes === 0) {
+            return res.status(404).json({ error: "Category not found" });
+        }
+
+        res.json({ message: "Category updated successfully!" });
+    } catch (err) {
+        res.status(500).json({ error: "Server error updating category: " + err.message });
+    }
+});
+
+// delete existing category by id
+router.delete('/delete/:cID', (req, res) => {
+    const { cID } = req.params;
+
+    try {
+        const stmt = db.prepare('DELETE FROM Category WHERE cID = ?');
+        const result = stmt.run(cID);
+
+        if (result.changes === 0) {
+            return res.status(404).json({ error: "Category not found" });
+        }
+
+        res.json({ message: "Category deleted successfully!" });
+    } catch (err) {
+        res.status(500).json({ error: "Server error deleting category: " + err.message });
+    }
+});
+
 module.exports = router;

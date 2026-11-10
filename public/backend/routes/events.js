@@ -45,4 +45,60 @@ router.post('/create', (req, res) => {
     }
 });
 
+// update existing event
+router.put('/update/:eID', (req, res) => {
+    const { eID } = req.params;
+    const { cID, title, desc, startT, endT, recurring, location, doneE } = req.body;
+
+    if (!title || !startT || !endT) {
+        return res.status(400).json({ error: "Title, start time, and end time are required for updates" });
+    }
+
+    try {
+        const query = `
+            UPDATE Event 
+            SET cID = ?, title = ?, desc = ?, startT = ?, endT = ?, recurring = ?, location = ?, doneE = ?, uAT = CURRENT_TIMESTAMP 
+            WHERE eID = ?
+        `;
+        const stmt = db.prepare(query);
+        const result = stmt.run(
+            cID || null, 
+            title, 
+            desc || null, 
+            startT, 
+            endT, 
+            recurring !== undefined ? recurring : false, 
+            location || null, 
+            doneE !== undefined ? doneE : false, 
+            eID
+        );
+
+        if (result.changes === 0) {
+            return res.status(404).json({ error: "Event not found" });
+        }
+
+        res.json({ message: "Event updated successfully!" });
+    } catch (err) {
+        res.status(500).json({ error: "Server error updating event: " + err.message });
+    }
+});
+
+// delete existing event by id
+router.delete('/delete/:eID', (req, res) => {
+    const { eID } = req.params;
+
+    try {
+        const stmt = db.prepare('DELETE FROM Event WHERE eID = ?');
+        const result = stmt.run(eID);
+
+        if (result.changes === 0) {
+            return res.status(404).json({ error: "Event not found" });
+        }
+
+        res.json({ message: "Event deleted successfully!" });
+    } catch (err) {
+        res.status(500).json({ error: "Server error deleting event: " + err.message });
+    }
+});
+
 module.exports = router;

@@ -44,4 +44,59 @@ router.post('/create', (req, res) => {
     }
 });
 
+// update existing task
+router.put('/update/:tID', (req, res) => {
+    const { tID } = req.params;
+    const { cID, title, desc, recurring, location, doneT, deadline } = req.body;
+
+    if (!title) {
+        return res.status(400).json({ error: "Task title is required for updates" });
+    }
+
+    try {
+        const query = `
+            UPDATE Task 
+            SET cID = ?, title = ?, desc = ?, recurring = ?, location = ?, doneT = ?, deadline = ?, uAT = CURRENT_TIMESTAMP 
+            WHERE tID = ?
+        `;
+        const stmt = db.prepare(query);
+        const result = stmt.run(
+            cID || null, 
+            title, 
+            desc || null, 
+            recurring !== undefined ? recurring : false, 
+            location || null, 
+            doneT !== undefined ? doneT : false, 
+            deadline || null, 
+            tID
+        );
+
+        if (result.changes === 0) {
+            return res.status(404).json({ error: "Task not found" });
+        }
+
+        res.json({ message: "Task updated successfully!" });
+    } catch (err) {
+        res.status(500).json({ error: "Server error updating task: " + err.message });
+    }
+});
+
+// delete existing task by id
+router.delete('/delete/:tID', (req, res) => {
+    const { tID } = req.params;
+
+    try {
+        const stmt = db.prepare('DELETE FROM Task WHERE tID = ?');
+        const result = stmt.run(tID);
+
+        if (result.changes === 0) {
+            return res.status(404).json({ error: "Task not found" });
+        }
+
+        res.json({ message: "Task deleted successfully!" });
+    } catch (err) {
+        res.status(500).json({ error: "Server error deleting task: " + err.message });
+    }
+});
+
 module.exports = router;

@@ -44,4 +44,59 @@ router.post('/create', (req, res) => {
     }
 });
 
+// update existing reminder
+router.put('/update/:rID', (req, res) => {
+    const { rID } = req.params;
+    const { cID, title, desc, dueRem, priority, recurring, doneR } = req.body;
+
+    if (!title) {
+        return res.status(400).json({ error: "Reminder title is required for updates" });
+    }
+
+    try {
+        const query = `
+            UPDATE Reminder 
+            SET cID = ?, title = ?, desc = ?, dueRem = ?, priority = ?, recurring = ?, doneR = ?, uAT = CURRENT_TIMESTAMP 
+            WHERE rID = ?
+        `;
+        const stmt = db.prepare(query);
+        const result = stmt.run(
+            cID || null, 
+            title, 
+            desc || null, 
+            dueRem || null, 
+            priority || 'medium', 
+            recurring !== undefined ? recurring : false, 
+            doneR !== undefined ? doneR : false, 
+            rID
+        );
+
+        if (result.changes === 0) {
+            return res.status(404).json({ error: "Reminder not found" });
+        }
+
+        res.json({ message: "Reminder updated successfully!" });
+    } catch (err) {
+        res.status(500).json({ error: "Server error updating reminder: " + err.message });
+    }
+});
+
+// delete existing reminder by id
+router.delete('/delete/:rID', (req, res) => {
+    const { rID } = req.params;
+
+    try {
+        const stmt = db.prepare('DELETE FROM Reminder WHERE rID = ?');
+        const result = stmt.run(rID);
+
+        if (result.changes === 0) {
+            return res.status(404).json({ error: "Reminder not found" });
+        }
+
+        res.json({ message: "Reminder deleted successfully!" });
+    } catch (err) {
+        res.status(500).json({ error: "Server error deleting reminder: " + err.message });
+    }
+});
+
 module.exports = router;
