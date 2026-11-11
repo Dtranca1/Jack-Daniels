@@ -20,6 +20,20 @@
                     <legend><strong>Create Account</strong></legend>
 
                     <p>
+                        <label for="email">First Name:</label><br>
+                        <input type="fName" name="fName" id="fName"
+                               size="30" placeholder="First Name"
+                               autocomplete="firstName" required>
+                    </p>
+
+                    <p>
+                        <label for="lName">Last Name:</label><br>
+                        <input type="lName" name="lName" id="lName"
+                               size="30" placeholder="Last Name"
+                               autocomplete="lName" required>
+                    </p>
+
+                    <p>
                         <label for="email">Email:</label><br>
                         <input type="email" name="email" id="email"
                                size="30" placeholder="Email Address"
@@ -44,7 +58,7 @@
 
                     <p>
                         <input id="submit" type="submit" value="Register">
-                        <input id="reset" type="reset" value="Reset">
+                        <input id="reset-button" type="reset" value="Reset">
                     </p>
 
                     <p>Already have an account? <a href="Login_updated.html">Log in</a>.</p>
@@ -68,6 +82,9 @@
         registrationForm.addEventListener("submit", async function (event) {
             event.preventDefault();
 
+
+            const fName = document.getElementById("fName").value.trim();
+            const lName = document.getElementById("lName").value.trim();
             const email = document.getElementById("email").value.trim();
             const password = document.getElementById("password").value;
             const confirmPassword = document.getElementById("confirm-password").value;
@@ -92,6 +109,8 @@
                         "Content-Type": "application/json"
                     },
                     body: JSON.stringify({
+                        firstN: fName,
+                        lastN: lName,
                         email: email,
                         Password: password
                     })
