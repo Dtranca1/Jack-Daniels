@@ -86,6 +86,8 @@
                 }
 
                 // Redirect only after the server confirms a successful login.
+                // Store the email only after successful authentication. Never store the password.
+                sessionStorage.setItem("loggedInEmail", email);
                 window.location.href = "dashboard.html";
             } catch (error) {
                 message.textContent = error.message || "Could not connect to the login server.";

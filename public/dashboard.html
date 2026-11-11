@@ -12,7 +12,7 @@
   <main class="dashboard" aria-label="Calendar dashboard">
     <header class="topbar">
       <div class="avatar" aria-label="User profile placeholder"></div>
-      <div class="username">Username</div>
+      <div class="username" id="dashboardUsername">Loading user...</div>
       <div class="date" id="todayDate"></div>
     </header>
 
@@ -43,6 +43,11 @@
 
     document.getElementById('todayDate').textContent =
       new Date().toLocaleDateString();
+
+    // Display the email saved by the login page for this browser session.
+    const loggedInEmail = sessionStorage.getItem('loggedInEmail');
+    document.getElementById('dashboardUsername').textContent =
+      loggedInEmail || 'Guest';
 
     addToggle.addEventListener('click', () => {
       const isOpen = addMenu.classList.toggle('show');
