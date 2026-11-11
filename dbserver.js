@@ -2,7 +2,8 @@
 const {DatabaseSync} = require("node:sqlite");
 //opens SQL Databse file names remindme.db
 //if it doesn't exist it will create a new one
-const db = new DatabaseSync("./remindme.db");
+const path = require('path');
+const db = new DatabaseSync(path.join(__dirname, 'remindme.db'));  // absolute path since it would make a new db in /backend, we want it in root dir
 
 //makes sqlite enforce relationships
 db.exec("PRAGMA foreign_keys = ON;");
@@ -142,6 +143,7 @@ db.exec(`
     )
 `);
 
+<<<<<<< HEAD
 // test if all five tables are made 
 const tables = db.prepare(`
    SELECT name 
@@ -160,3 +162,7 @@ const aUser = db.prepare(`
 
 aUser.run("Michael", "Camaj","michaelcamaj@oakland.edu","test_hash");
 console.log("User added success!");
+=======
+// export db connection so other files can use it
+module.exports = db;
+>>>>>>> 20402eed9c21d7f81e969cd268b04f0e3e5cca10
