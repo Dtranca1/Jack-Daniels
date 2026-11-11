@@ -143,6 +143,7 @@ db.exec(`
     )
 `);
 
+/*
 // test if all five tables are made 
 const tables = db.prepare(`
    SELECT name 
@@ -162,4 +163,5 @@ const aUser = db.prepare(`
 aUser.run("Michael", "Camaj","michaelcamaj@oakland.edu","test_hash");
 console.log("User added success!");
 // export db connection so other files can use it
+*/
 module.exports = db;
