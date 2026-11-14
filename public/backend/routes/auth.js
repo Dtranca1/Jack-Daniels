@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcrypt');
-const db = require('../../../dbserver'); // Imports your SQLite DatabaseSync connection
+const db = require('../../../dbserver'); // import sqlite database connection instance
 
-// register route
+// register route [POST]
 router.post('/register', async (req, res) => {
     const { firstN, lastN, email, Password } = req.body;
 
@@ -12,6 +12,7 @@ router.post('/register', async (req, res) => {
         return res.status(400).json({ error: "First name, last name, email, and password are required" });
     }
 
+    // try user registration and password hash
     try {
         // hash and salt password
         const saltRounds = 10;
@@ -33,11 +34,12 @@ router.post('/register', async (req, res) => {
         if (err.message && err.message.includes('UNIQUE constraint failed')) {
             return res.status(400).json({ error: "Email is already registered" });
         }
+        // error message
         res.status(500).json({ error: "Server error during registration: " + err.message });
     }
 });
 
-// login route
+// login route [POST]
 router.post('/login', async (req, res) => {
     const { email, Password } = req.body;
 
@@ -46,6 +48,7 @@ router.post('/login', async (req, res) => {
         return res.status(400).json({ error: "Email and password are required" });
     }
 
+    // try to auth user details
     try {
         // find the user in the database by email
         const query = `SELECT * FROM User WHERE email = ?`;
@@ -73,6 +76,7 @@ router.post('/login', async (req, res) => {
                 lastN: user.lastN
             } 
         });
+        // error message
     } catch (err) {
         res.status(500).json({ error: "Server error during login: " + err.message });
     }
