@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
+  <!-- Meta tags and page title -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Calendar Dashboard</title>
@@ -9,6 +10,7 @@
   <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
 </head>
 <body>
+  <!-- Dashboard content -->
   <main class="dashboard" aria-label="Calendar dashboard">
     <header class="topbar">
       <div class="avatar" aria-label="User profile placeholder"></div>
@@ -23,11 +25,42 @@
           <p class="no-events">No events scheduled.</p>
         </div>
       </section>
-
+    <!-- Add event controls --> 
       <div class="add-control">
         <button class="add-button btn p-0" id="addToggle" type="button"
           aria-label="Open create menu" aria-expanded="false" aria-controls="addMenu"></button>
-        <button class="add-menu btn" id="addMenu" type="button" aria-label="Create new item">New</button>
+        <section class="add-menu" id="addMenu" aria-labelledby="eventFormHeading" aria-hidden="true">
+          <h2 id="eventFormHeading">New event</h2>
+          <form id="eventForm">
+            <label for="eventTitle">Event name</label>
+            <input id="eventTitle" name="title" type="text" maxlength="120" required>
+
+            <label for="eventDate">Date</label>
+            <input id="eventDate" name="date" type="date" required>
+
+            <label for="eventStartTime">Start time</label>
+            <input id="eventStartTime" name="startTime" type="time">
+
+            <label for="eventEndTime">End time</label>
+            <input id="eventEndTime" name="endTime" type="time">
+
+            <label for="eventDescription">Description</label>
+            <textarea id="eventDescription" name="description" rows="3" maxlength="1000"></textarea>
+
+            <label for="eventCategory">Color</label>
+            <select id="eventCategory" name="category">
+              <option value="blue">Blue</option>
+              <option value="red">Red</option>
+              <option value="yellow">Yellow</option>
+            </select>
+    <!-- Event form actions --> 
+            <p class="event-form-message" id="eventFormMessage" role="status" aria-live="polite"></p>
+            <div class="event-form-actions">
+              <button type="button" class="event-cancel" id="cancelEvent">Cancel</button>
+              <button type="submit" class="event-submit" id="saveEvent">Save event</button>
+            </div>
+          </form>
+        </section>
       </div>
     </aside>
 
@@ -35,7 +68,7 @@
       <div id="calendar"></div>
     </section>
   </main>
-
+<!-- JavaScript -->
   <script>
     const addToggle = document.getElementById('addToggle');
     const addMenu = document.getElementById('addMenu');
@@ -49,18 +82,34 @@
     document.getElementById('dashboardUsername').textContent =
       loggedInEmail || 'Guest';
 
+    const eventForm = document.getElementById('eventForm');
+    const eventFormMessage = document.getElementById('eventFormMessage');
+    const cancelEvent = document.getElementById('cancelEvent');
+    const saveEventButton = document.getElementById('saveEvent');
+    // Toggle the add event form.
+    function setEventFormOpen(open) {
+      addMenu.classList.toggle('show', open);
+      addMenu.setAttribute('aria-hidden', String(!open));
+      addToggle.setAttribute('aria-expanded', String(open));
+      if (open) document.getElementById('eventTitle').focus();
+    }
+    // Add event form toggle.
     addToggle.addEventListener('click', () => {
-      const isOpen = addMenu.classList.toggle('show');
-      addToggle.setAttribute('aria-expanded', String(isOpen));
+      setEventFormOpen(!addMenu.classList.contains('show'));
+    });
+
+    cancelEvent.addEventListener('click', () => {
+      eventForm.reset();
+      eventFormMessage.textContent = '';
+      setEventFormOpen(false);
     });
 
     document.addEventListener('click', (event) => {
       if (!event.target.closest('.add-control')) {
-        addMenu.classList.remove('show');
-        addToggle.setAttribute('aria-expanded', 'false');
+        setEventFormOpen(false);
       }
     });
-
+    // Format event dates for display.
     function formatEventDate(event) {
       if (event.allDay) {
         return event.start.toLocaleDateString(undefined, {
@@ -72,7 +121,7 @@
         hour: 'numeric', minute: '2-digit'
       });
     }
-
+    // Render events in the sidebar.
     function renderSidebarEvents(events) {
       eventList.replaceChildren();
 
@@ -87,7 +136,7 @@
         eventList.appendChild(emptyMessage);
         return;
       }
-
+      // Create a button for each event.
       sortedEvents.forEach((event) => {
         const eventButton = document.createElement('button');
         eventButton.type = 'button';
@@ -99,11 +148,11 @@
         eventButton.setAttribute('aria-label',
           `${event.title}, ${event.start ? formatEventDate(event) : 'date not set'}`
         );
-
+        // Create a span for the event title.
         const title = document.createElement('span');
         title.className = 'sidebar-event-title';
         title.textContent = event.title;
-
+        // Create a span for the event date.
         const date = document.createElement('span');
         date.className = 'sidebar-event-date';
         date.textContent = event.start ? formatEventDate(event) : 'Date not set';
@@ -120,7 +169,7 @@
         eventList.appendChild(eventButton);
       });
     }
-
+    // Initialize the calendar.
     const calendar = new FullCalendar.Calendar(document.getElementById('calendar'), {
       initialView: 'dayGridMonth',
       initialDate: '2026-10-01',
@@ -129,53 +178,122 @@
         center: 'title',
         right: 'dayGridMonth,timeGridWeek,listWeek'
       },
-      events: [
-        {
-          title: 'Red Task',
-          start: '2026-10-05',
-          backgroundColor: '#f02e32',
-          borderColor: '#f02e32'
-        },
-        {
-          title: 'Blue Task',
-          start: '2026-10-12',
-          backgroundColor: '#303fe8',
-          borderColor: '#303fe8'
-        },
-        {
-          title: 'Yellow Task',
-          start: '2026-10-18',
-          backgroundColor: '#f1ed2d',
-          borderColor: '#f1ed2d',
-          textColor: '#303030'
+      events: async (info, successCallback, failureCallback) => {
+        try {
+          const email = sessionStorage.getItem('loggedInEmail');
+          const response = await fetch(
+            `http://localhost:3000/api/events?email=${encodeURIComponent(email || '')}`
+          );
+          if (!response.ok) throw new Error('Could not load saved events.');
+          const rows = await response.json();
+          successCallback(rows.map((item) => ({
+            id: item.id,
+            title: item.title,
+            start: item.start,
+            end: item.end || undefined,
+            allDay: item.allDay ?? (!item.startTime),
+            extendedProps: {
+              description: item.description || '',
+              category: item.category || 'blue'
+            },
+            backgroundColor: item.category === 'red' ? '#f02e32' :
+              item.category === 'yellow' ? '#f1ed2d' : '#303fe8',
+            borderColor: item.category === 'red' ? '#f02e32' :
+              item.category === 'yellow' ? '#f1ed2d' : '#303fe8',
+            textColor: item.category === 'yellow' ? '#303030' : '#ffffff'
+          })));
+        } catch (error) {
+          console.error(error);
+          failureCallback(error);
         }
-      ],
+      },
       eventsSet: renderSidebarEvents
     });
-
+    // Render the calendar.
     calendar.render();
 
-    addMenu.addEventListener('click', () => {
-      addMenu.classList.remove('show');
-      addToggle.setAttribute('aria-expanded', 'false');
+    eventForm.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      eventFormMessage.textContent = '';
 
-      const title = prompt('What is the event called?');
-      if (!title || !title.trim()) return;
-
-      const date = prompt('What date? Use YYYY-MM-DD (for example, 2026-11-15).');
-      if (!date || !/^\\d{4}-\\d{2}-\\d{2}$/.test(date)) {
-        alert('Please enter the date in YYYY-MM-DD format.');
+      const formData = new FormData(eventForm);
+      const title = String(formData.get('title') || '').trim();
+      const date = String(formData.get('date') || '');
+      const startTime = String(formData.get('startTime') || '');
+      const endTime = String(formData.get('endTime') || '');
+      const description = String(formData.get('description') || '').trim();
+      const category = String(formData.get('category') || 'blue');
+      const email = sessionStorage.getItem('loggedInEmail');
+      // Check if the user is logged in.
+      if (!email) {
+        eventFormMessage.textContent = 'Please log in again before saving an event.';
         return;
       }
 
-      calendar.addEvent({
-        title: title.trim(),
-        start: date,
-        allDay: true,
-        backgroundColor: '#303fe8',
-        borderColor: '#303fe8'
-      });
+      // Validate the event times.
+      if (startTime && endTime && endTime <= startTime) {
+        eventFormMessage.textContent = 'The end time must be later than the start time.';
+        return;
+      }
+
+      const allDay = !startTime;
+      const start = allDay ? date : `${date}T${startTime}:00`;
+      const end = endTime ? `${date}T${endTime}:00` : null;
+
+      saveEventButton.disabled = true;
+      saveEventButton.textContent = 'Saving...';
+
+      try {
+        // The backend should insert this JSON into its events table and return the saved event.
+        const response = await fetch('http://localhost:3000/api/events', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email,
+            title,
+            start,
+            end,
+            allDay,
+            description,
+            category
+          })
+        });
+
+        const result = await response.json().catch(() => ({}));
+        if (!response.ok) {
+          throw new Error(result.message || 'The event could not be saved.');
+        }
+        // Add the saved event to the calendar.
+        const savedEvent = result.event || result;
+        calendar.addEvent({
+          id: savedEvent.id,
+          title,
+          start,
+          end: end || undefined,
+          allDay,
+          backgroundColor: category === 'red' ? '#f02e32' :
+            category === 'yellow' ? '#f1ed2d' : '#303fe8',
+          borderColor: category === 'red' ? '#f02e32' :
+            category === 'yellow' ? '#f1ed2d' : '#303fe8',
+          textColor: category === 'yellow' ? '#303030' : '#ffffff',
+          extendedProps: { description, category }
+        });
+
+        eventForm.reset();
+        eventFormMessage.textContent = 'Event saved successfully.';
+        setTimeout(() => {
+          eventFormMessage.textContent = '';
+          setEventFormOpen(false);
+        }, 900);
+      } catch (error) {
+        eventFormMessage.textContent =
+          `${error.message} Check that the server supports POST /api/events.`;
+      } finally {
+        saveEventButton.disabled = false;
+        saveEventButton.textContent = 'Save event';
+      }
     });
+
   </script>
 </body>
 </html>
