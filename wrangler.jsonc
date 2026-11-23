@@ -1,15 +1,27 @@
 {
+  // name of the Cloudflare Worker
   "name": "jack-daniels",
+
+  // tells Cloudflare where the Worker JavaScript file is located
   "main": "./src/index.js",
+
+  // tells Cloudflare which compatibility version to use
   "compatibility_date": "2026-11-13",
   "compatibility_flags": ["nodejs_compat"],
 
+  // settings for the frontend files
   "assets": {
+    // tells Cloudflare that the website files are inside the public folder
     "directory": "./public",
+
+    // lets the Worker access the public files using env.ASSETS
     "binding": "ASSETS",
-    "run_worker_first": ["/api/*"]
+
+    // makes the Worker run before static frontend files
+    "run_worker_first": true
   },
 
+  // connects the Worker to the D1 database
   "d1_databases": [
     {
       "binding": "DB",
