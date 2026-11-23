@@ -36,7 +36,11 @@ app.get('/', (req, res) => {
     res.json({ message: "API is running successfully!" });
 });
 
-// start server
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-});
+// Replaced app.listen(...) with conditional local listen + Worker handler export
+if (!process.env.WORKERS_RUNTIME) {
+    app.listen(PORT, () => {
+        console.log(`Server is running on port ${PORT}`);
+    });
+}
+
+export default httpServerHandler({ port: PORT });

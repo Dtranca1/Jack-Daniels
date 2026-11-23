@@ -1,6 +1,6 @@
 {
   "name": "jack-daniels",
-  "main": "./src/index.js",
+  "main": "./public/backend/server.js",
   "compatibility_date": "2026-11-13",
 
   "assets": {
