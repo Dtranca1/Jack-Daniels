@@ -1,5 +1,5 @@
 const express = require('express');
-const db = require('../../dbserver');
+const db = require('../../dbserver'); // import sqlite database connection instance
 const cors = require('cors');
 const authRoutes = require('./routes/auth'); // auth route 
 const taskRoutes = require('./routes/tasks'); // task route
