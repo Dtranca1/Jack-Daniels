@@ -5,7 +5,7 @@
   }
 
   * { box-sizing: border-box; }
-
+/* Reset default margins and paddings, and ensure the body takes up the full viewport height. */
   html, body {
     width: 100%;
     height: 100%;
@@ -14,12 +14,12 @@
     padding: 0;
     overflow: hidden;
   }
-
+/* Set the font family and background color for the body. */
   body {
     font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
     background: var(--panel);
   }
-
+/* Define the main dashboard layout using CSS Grid. */
   .dashboard {
     width: 100%;
     height: 100vh;
@@ -33,7 +33,7 @@
     background: var(--panel);
     color: #fff;
   }
-
+/* Define the top bar layout and styling. */
   .topbar {
     grid-column: 1 / -1;
     display: flex;
@@ -45,7 +45,7 @@
     background: var(--ink);
     border-bottom: 3px solid #666;
   }
-
+/* Define the avatar styling. */
   .avatar {
     width: 82px;
     height: 58px;
@@ -53,19 +53,19 @@
     background: #fff;
     border-radius: 50%;
   }
-
+/* Define the username and date styling. */
   .username, .date {
     color: #fff;
     font-size: clamp(20px, 2.3vw, 32px);
     font-weight: 900;
     line-height: 1;
   }
-
+/* Align the date to the right and prevent it from wrapping. */
   .date {
     margin-left: auto;
     white-space: nowrap;
   }
-
+/* Define the sidebar layout and styling. */
   .sidebar {
     position: relative;
     z-index: 10;
@@ -88,7 +88,7 @@
     flex-direction: column;
     align-items: stretch;
 }
-
+/* Sidebar events container */
 .sidebar-events {
     width: 100%;
     padding: 14px 10px 8px;
@@ -106,13 +106,13 @@
     font-weight: 700;
     text-align: center;
 }
-
+/* Event list container */
 .event-list {
     display: flex;
     flex-direction: column;
     gap: 8px;
 }
-
+/* Individual event item */
 .sidebar-event {
     display: block;
     width: 100%;
@@ -126,14 +126,14 @@
     cursor: pointer;
     overflow-wrap: anywhere;
 }
-
+/* Hover and focus styles for event items */
 .sidebar-event:hover,
 .sidebar-event:focus-visible {
     background: rgba(255, 255, 255, .23);
     outline: 2px solid rgba(255, 255, 255, .7);
     outline-offset: 1px;
 }
-
+/* Event title and date styling */
 .sidebar-event-title {
     display: block;
     font-size: 13px;
@@ -159,7 +159,7 @@
 .sidebar .add-control {
     flex: 0 0 auto;
 }
-
+/* Responsive adjustments for smaller screens */
 @media (max-width: 600px) {
     .sidebar-events {
         padding-left: 6px;
@@ -179,7 +179,7 @@
     }
 }
 
-
+/* Add button control styling */
 .add-control {
     position: absolute;
     z-index: 11;
@@ -217,7 +217,7 @@
 
   
   
-
+/* Workspace area styling */
   .workspace {
     position: relative;
     width: 100%;
@@ -228,7 +228,7 @@
     overflow: auto;
     background: var(--panel);
   }
-
+/* Calendar container styling */
   #calendar {
     width: 100%;
     height: 100%;
@@ -236,7 +236,7 @@
     background: #fff;
     color: var(--ink);
   }
-
+/* Responsive adjustments for smaller screens */
   @media (max-width: 700px) {
     .dashboard {
       grid-template-columns: 78px minmax(0, 1fr);
@@ -283,7 +283,7 @@
     box-shadow: 0 8px 24px rgba(0, 0, 0, .28);
     font-family: Arial, sans-serif;
 }
-
+/* Create a speech-bubble effect with a rotated square */
 .add-menu::before {
     content: "";
     position: absolute;
@@ -296,7 +296,7 @@
     border-bottom: 2px solid #303030;
     transform: rotate(45deg);
 }
-
+/* Show the add-menu when the 'show' class is added */
 .add-menu.show { display: block; }
 
 .add-menu h2 {
@@ -306,19 +306,19 @@
     font-size: 20px;
     font-weight: 700;
 }
-
+/* Style the form inside the add-menu */
 #eventForm {
     display: grid;
     gap: 7px;
 }
-
+/* Style the labels for the form fields */
 #eventForm label {
     margin-top: 5px;
     color: #303030;
     font-size: 13px;
     font-weight: 700;
 }
-
+/* Style the input, textarea, and select elements inside the form */
 #eventForm input,
 #eventForm textarea,
 #eventForm select {
@@ -333,14 +333,14 @@
 }
 
 #eventForm textarea { resize: vertical; }
-
+/* Style the action buttons for the form */
 .event-form-actions {
     display: flex;
     justify-content: flex-end;
     gap: 8px;
     margin-top: 8px;
 }
-
+/* Style the buttons inside the form actions */
 .event-form-actions button {
     padding: 8px 12px;
     border: 0;
@@ -348,18 +348,18 @@
     font: 700 13px Arial, sans-serif;
     cursor: pointer;
 }
-
+/* Style the cancel and submit buttons */
 .event-cancel { background: #e5e5e5; color: #303030; }
 .event-submit { background: #303030; color: #fff; }
 .event-form-actions button:disabled { opacity: .6; cursor: wait; }
-
+/* Style the message area for form validation or feedback */
 .event-form-message {
     min-height: 16px;
     margin: 3px 0 0;
     color: #9b2020;
     font: 12px/1.35 Arial, sans-serif;
 }
-
+/* Responsive adjustments for the add-menu on smaller screens */
 @media (max-width: 700px) {
     .add-menu {
         left: calc(100% + 12px);
@@ -375,7 +375,7 @@
     gap: 12px;
     position: relative;
 }
-
+/* Style the login button in the dashboard */
 .dashboard-login-button {
     display: inline-flex;
     align-items: center;
@@ -388,21 +388,21 @@
     text-decoration: none;
     transition: background .2s ease;
 }
-
+/* Hover effect for the login button */
 .dashboard-login-button:hover {
     background: #2430bd;
     color: #fff;
 }
-
+/* Style the username display in the dashboard */
 .username {
     font-weight: 600;
     overflow-wrap: anywhere;
 }
-
+/* Container for the avatar button and dropdown menu */
 .avatar-menu-container {
     position: relative;
 }
-
+/* Style the avatar button that triggers the dropdown */
 .avatar-button {
     display: inline-flex;
     align-items: center;
@@ -416,7 +416,7 @@
     color: #303fe8;
     cursor: pointer;
 }
-
+/* Style the SVG icon inside the avatar button */
 .avatar-button svg {
     width: 100%;
     height: 100%;
@@ -426,7 +426,7 @@
     stroke-linecap: round;
     stroke-linejoin: round;
 }
-
+/* Focus-visible styles for accessibility */
 .avatar-button:focus-visible,
 .avatar-dropdown button:focus-visible,
 .dashboard-login-button:focus-visible {
@@ -445,12 +445,12 @@
     background: #fff;
     box-shadow: 0 8px 24px rgba(0, 0, 0, .16);
 }
-
+/* Hide elements with the 'hidden' attribute */
 .avatar-dropdown[hidden],
 [hidden] {
     display: none !important;
 }
-
+/* Style the account section inside the dropdown */
 .dropdown-account {
     padding: 9px 10px;
     color: #555;
@@ -459,7 +459,7 @@
     border-bottom: 1px solid #eee;
     margin-bottom: 6px;
 }
-
+/* Style the buttons inside the avatar dropdown */
 .avatar-dropdown button {
     display: block;
     width: 100%;
@@ -471,11 +471,11 @@
     text-align: left;
     cursor: pointer;
 }
-
+/* Hover effect for the buttons inside the avatar dropdown */
 .avatar-dropdown button:hover {
     background: #f1f2ff;
 }
-
+/* Responsive adjustments for smaller screens */
 @media (max-width: 520px) {
     .account-controls {
         gap: 7px;
