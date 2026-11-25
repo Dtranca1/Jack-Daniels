@@ -368,3 +368,126 @@
         padding: 13px 13px 26px;
     }
 }
+/* Dashboard account controls and avatar dropdown */
+.account-controls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    position: relative;
+}
+
+.dashboard-login-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 15px;
+    border-radius: 6px;
+    background: #303fe8;
+    color: #fff;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background .2s ease;
+}
+
+.dashboard-login-button:hover {
+    background: #2430bd;
+    color: #fff;
+}
+
+.username {
+    font-weight: 600;
+    overflow-wrap: anywhere;
+}
+
+.avatar-menu-container {
+    position: relative;
+}
+
+.avatar-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    padding: 8px;
+    border: 0;
+    border-radius: 50%;
+    background: #e8eaff;
+    color: #303fe8;
+    cursor: pointer;
+}
+
+.avatar-button svg {
+    width: 100%;
+    height: 100%;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.avatar-button:focus-visible,
+.avatar-dropdown button:focus-visible,
+.dashboard-login-button:focus-visible {
+    outline: 3px solid #f1b82d;
+    outline-offset: 3px;
+}
+
+/* Fixed positioning plus viewport clamping keeps the menu on screen. */
+.avatar-dropdown {
+    position: fixed;
+    z-index: 2000;
+    width: min(210px, calc(100vw - 24px));
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    background: #fff;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, .16);
+}
+
+.avatar-dropdown[hidden],
+[hidden] {
+    display: none !important;
+}
+
+.dropdown-account {
+    padding: 9px 10px;
+    color: #555;
+    font-size: 13px;
+    overflow-wrap: anywhere;
+    border-bottom: 1px solid #eee;
+    margin-bottom: 6px;
+}
+
+.avatar-dropdown button {
+    display: block;
+    width: 100%;
+    padding: 9px 10px;
+    border: 0;
+    border-radius: 6px;
+    background: transparent;
+    color: #222;
+    text-align: left;
+    cursor: pointer;
+}
+
+.avatar-dropdown button:hover {
+    background: #f1f2ff;
+}
+
+@media (max-width: 520px) {
+    .account-controls {
+        gap: 7px;
+    }
+
+    .username {
+        max-width: 115px;
+        font-size: 13px;
+    }
+
+    .dashboard-login-button {
+        padding: 7px 10px;
+        font-size: 13px;
+    }
+}
