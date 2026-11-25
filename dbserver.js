@@ -1,3 +1,11 @@
+/**
+ * File: dbserver.js
+ * Purpose: Initializes the synchronous SQLite database connection (remindme.db),
+ *          enforces foreign key constraints, and creates the core relational tables
+ *          (User, Category, Reminder, Task, Event) if they do not already exist.
+ * Dependencies: node:sqlite, path
+ */
+
 // imports sqlite 3 package so the node.js can work with the SQL Database
 const {DatabaseSync} = require("node:sqlite");
 //opens SQL Databse file names remindme.db
@@ -162,6 +170,7 @@ const aUser = db.prepare(`
 
 aUser.run("Michael", "Camaj","michaelcamaj@oakland.edu","test_hash");
 console.log("User added success!");
-// export db connection so other files can use it
 */
+
+// export db connection so other files can use it
 module.exports = db;
