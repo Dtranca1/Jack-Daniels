@@ -95,6 +95,8 @@
                 submitButton.value = "Login";
             }
         });
+        sessionStorage.setItem('loggedInUID', user.uID);
+        sessionStorage.setItem('loggedInEmail', user.email);
     </script>
 </body>
 </html>
