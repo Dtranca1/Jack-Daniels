@@ -1,8 +1,21 @@
+/**
+ * File: categories.js
+ * Purpose: Defines Express REST API routes for creating, retrieving,
+ *          updating, and deleting user color categories in the SQLite database
+ * Dependencies: express, ../../../dbserver
+ */
+
 const express = require('express');
 const router = express.Router();
 const db = require('../../../dbserver'); // import sqlite database connection instance
 
-// get all categories for specific user [GET]
+/**
+ * @route   GET /api/categories/:uID
+ * @desc    Retrieves all categories associated with a specific user ID
+ * @param   {number} uID - User ID from URL path
+ * @returns {200} JSON object containing an array of category records ({ categories })
+ * @returns {500} Database query error message
+ */
 router.get('/:uID', (req, res) => {
     const { uID } = req.params;
 
@@ -18,7 +31,15 @@ router.get('/:uID', (req, res) => {
     }
 });
 
-// create new category [POST]
+/**
+ * @route   POST /api/categories/create
+ * @desc    Inserts a new category record into the Category table
+ * @body    {number} uID - Required user foreign key
+ * @body    {string} name - Required category name
+ * @body    {string} [colorCat] - Optional hex/color identifier for the category
+ * @returns {201} JSON confirmation message and generated category ID (cID)
+ * @returns {400|500} Missing required field or database insertion error
+ */
 router.post('/create', (req, res) => {
     const { uID, name, colorCat } = req.body;
 
@@ -45,7 +66,15 @@ router.post('/create', (req, res) => {
     }
 });
 
-// update existing category [PUT]
+/**
+ * @route   PUT /api/categories/update/:cID
+ * @desc    Updates an existing category's name and color identifier
+ * @param   {number} cID - Category ID from URL path
+ * @body    {string} name - Required updated category name
+ * @body    {string} [colorCat] - Optional updated color identifier
+ * @returns {200} JSON confirmation message
+ * @returns {400|404|500} Validation error, category not found, or database error
+ */
 router.put('/update/:cID', (req, res) => {
     const { cID } = req.params;
     const { name, colorCat } = req.body;
@@ -78,7 +107,13 @@ router.put('/update/:cID', (req, res) => {
     }
 });
 
-// delete existing category by id [DELETE]
+/**
+ * @route   DELETE /api/categories/delete/:cID
+ * @desc    Deletes a specific category record by its category ID
+ * @param   {number} cID - Category ID from URL path
+ * @returns {200} JSON confirmation message
+ * @returns {404|500} Category not found or database deletion error
+ */
 router.delete('/delete/:cID', (req, res) => {
     const { cID } = req.params;
 

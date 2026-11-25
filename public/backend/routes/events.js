@@ -1,8 +1,21 @@
+/**
+ * File: events.js
+ * Purpose: Defines Express REST API routes for creating, retrieving,
+ *          updating, and deleting scheduled calendar events in the SQLite database
+ * Dependencies: express, ../../../dbserver
+ */
+
 const express = require('express');
 const router = express.Router();
 const db = require('../../../dbserver'); // import sqlite database connection instance
 
-// get all events for specific user [GET]
+/**
+ * @route   GET /api/events/:uID
+ * @desc    Retrieves all scheduled events associated with a specific user ID
+ * @param   {number} uID - User ID from URL path
+ * @returns {200} JSON object containing an array of event records ({ events })
+ * @returns {500} Database query error message
+ */
 router.get('/:uID', (req, res) => {
     const { uID } = req.params;
 
@@ -17,7 +30,20 @@ router.get('/:uID', (req, res) => {
     }
 });
 
-// create new event [POST]
+/**
+ * @route   POST /api/events/create
+ * @desc    Inserts a new event record into the Event table
+ * @body    {number} uID - Required user foreign key
+ * @body    {number} [cID] - Optional category foreign key
+ * @body    {string} title - Required event title
+ * @body    {string} [desc] - Optional event description
+ * @body    {string} startT - Required start timestamp/string
+ * @body    {string} endT - Required end timestamp/string
+ * @body    {boolean} [recurring=false] - Whether the event repeats
+ * @body    {string} [location] - Optional event location
+ * @returns {201} JSON confirmation message and generated event ID (eID)
+ * @returns {400|500} Missing required field or database insertion error
+ */
 router.post('/create', (req, res) => {
     const { uID, cID, title, desc, startT, endT, recurring, location } = req.body;
 
@@ -52,7 +78,21 @@ router.post('/create', (req, res) => {
     }
 });
 
-// update existing event [PUT]
+/**
+ * @route   PUT /api/events/update/:eID
+ * @desc    Updates an existing event's fields and refreshes its uAT timestamp
+ * @param   {number} eID - Event ID from URL path
+ * @body    {string} title - Required updated event title
+ * @body    {string} startT - Required updated start timestamp/string
+ * @body    {string} endT - Required updated end timestamp/string
+ * @body    {number} [cID] - Optional category foreign key
+ * @body    {string} [desc] - Optional event description
+ * @body    {boolean} [recurring=false] - Recurrence flag
+ * @body    {string} [location] - Optional event location
+ * @body    {boolean} [doneE=false] - Event completion flag
+ * @returns {200} JSON confirmation message
+ * @returns {400|404|500} Validation error, event not found, or database error
+ */
 router.put('/update/:eID', (req, res) => {
     const { eID } = req.params;
     const { cID, title, desc, startT, endT, recurring, location, doneE } = req.body;
@@ -95,7 +135,13 @@ router.put('/update/:eID', (req, res) => {
     }
 });
 
-// delete existing event by id [DELETE]
+/**
+ * @route   DELETE /api/events/delete/:eID
+ * @desc    Deletes a specific event record by its event ID
+ * @param   {number} eID - Event ID from URL path
+ * @returns {200} JSON confirmation message
+ * @returns {404|500} Event not found or database deletion error
+ */
 router.delete('/delete/:eID', (req, res) => {
     const { eID } = req.params;
 

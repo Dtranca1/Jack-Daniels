@@ -1,9 +1,25 @@
+/**
+ * File: auth.js
+ * Purpose: Defines Express REST API routes for user account registration and
+ *          authentication using bcrypt password hashing and SQLite.
+ * Dependencies: express, bcrypt, ../../../dbserver
+ */
+
 const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcrypt');
 const db = require('../../../dbserver'); // import sqlite database connection instance
 
-// register route [POST]
+/**
+ * @route   POST /api/auth/register
+ * @desc    Hashes the user's password and creates a new user record in the User table
+ * @body    {string} firstN - Required user first name
+ * @body    {string} lastN - Required user last name
+ * @body    {string} email - Required unique user email address
+ * @body    {string} Password - Required plaintext password (hashed via bcrypt before storage)
+ * @returns {201} JSON confirmation message and generated user ID (uID)
+ * @returns {400|500} Validation error, duplicate email error, or server error
+ */
 router.post('/register', async (req, res) => {
     const { firstN, lastN, email, Password } = req.body;
 
@@ -39,7 +55,14 @@ router.post('/register', async (req, res) => {
     }
 });
 
-// login route [POST]
+/**
+ * @route   POST /api/auth/login
+ * @desc    Authenticates a user by comparing their submitted password against the stored bcrypt hash
+ * @body    {string} email - Required user email address
+ * @body    {string} Password - Required plaintext password to verify
+ * @returns {200} JSON confirmation message and public user profile object ({ uID, email, firstN, lastN })
+ * @returns {400|401|500} Missing credentials, invalid email/password, or server error
+ */
 router.post('/login', async (req, res) => {
     const { email, Password } = req.body;
 

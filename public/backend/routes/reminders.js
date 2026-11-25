@@ -1,8 +1,21 @@
+/**
+ * File: reminders.js
+ * Purpose: Defines Express REST API routes for creating, retrieving,
+ *          updating, and deleting user reminders in the SQLite database
+ * Dependencies: express, ../../../dbserver
+ */
+
 const express = require('express');
 const router = express.Router();
 const db = require('../../../dbserver'); // import sqlite database connection instance
 
-// get all reminders for specific user [GET]
+/**
+ * @route   GET /api/reminders/:uID
+ * @desc    Retrieves all reminders associated with a specific user ID
+ * @param   {number} uID - User ID from URL path
+ * @returns {200} JSON object containing an array of reminder records ({ reminders })
+ * @returns {500} Database query error message
+ */
 router.get('/:uID', (req, res) => {
     const { uID } = req.params;
 
@@ -17,7 +30,19 @@ router.get('/:uID', (req, res) => {
     }
 });
 
-// create new reminder [POST]
+/**
+ * @route   POST /api/reminders/create
+ * @desc    Inserts a new reminder record into the Reminder table
+ * @body    {number} uID - Required user foreign key
+ * @body    {number} [cID] - Optional category foreign key
+ * @body    {string} title - Required reminder title
+ * @body    {string} [desc] - Optional reminder description
+ * @body    {string} [dueRem] - Optional due date/time string
+ * @body    {string} [priority='medium'] - Optional priority level
+ * @body    {boolean} [recurring=false] - Whether the reminder repeats
+ * @returns {201} JSON confirmation message and generated reminder ID (rID)
+ * @returns {400|500} Missing required field or database insertion error
+ */
 router.post('/create', (req, res) => {
     const { uID, cID, title, desc, dueRem, priority, recurring } = req.body;
 
@@ -51,7 +76,20 @@ router.post('/create', (req, res) => {
     }
 });
 
-// update existing reminder [PUT]
+/**
+ * @route   PUT /api/reminders/update/:rID
+ * @desc    Updates an existing reminder's fields and refreshes its uAT timestamp
+ * @param   {number} rID - Reminder ID from URL path
+ * @body    {string} title - Required updated reminder title
+ * @body    {number} [cID] - Optional category foreign key
+ * @body    {string} [desc] - Optional reminder description
+ * @body    {string} [dueRem] - Optional due date/time string
+ * @body    {string} [priority='medium'] - Optional priority level
+ * @body    {boolean} [recurring=false] - Recurrence flag
+ * @body    {boolean} [doneR=false] - Reminder completion flag
+ * @returns {200} JSON confirmation message
+ * @returns {400|404|500} Validation error, reminder not found, or database error
+ */
 router.put('/update/:rID', (req, res) => {
     const { rID } = req.params;
     const { cID, title, desc, dueRem, priority, recurring, doneR } = req.body;
@@ -93,7 +131,13 @@ router.put('/update/:rID', (req, res) => {
     }
 });
 
-// delete existing reminder by id [DELETE]
+/**
+ * @route   DELETE /api/reminders/delete/:rID
+ * @desc    Deletes a specific reminder record by its reminder ID
+ * @param   {number} rID - Reminder ID from URL path
+ * @returns {200} JSON confirmation message
+ * @returns {404|500} Reminder not found or database deletion error
+ */
 router.delete('/delete/:rID', (req, res) => {
     const { rID } = req.params;
 

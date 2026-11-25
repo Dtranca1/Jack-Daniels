@@ -1,3 +1,9 @@
+/**
+ * File: server.js
+ * Purpose: Backend server instructions to make the node server function
+ * Dependencies: express, ../../dbserver, cors, ./routes/auth. ./routes/tasks, ./routes/reminders, ./routes/categories, ./routes/events
+ */
+
 const express = require('express');
 const db = require('../../dbserver'); // import sqlite database connection instance
 const cors = require('cors');
@@ -10,7 +16,7 @@ const eventRoutes = require('./routes/events'); // event route
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// middleware to fix port stuff
+// enable CORS allowing frontend origins to call API
 app.use(cors());
 
 // middleware to parse incoming json requests

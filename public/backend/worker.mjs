@@ -1,3 +1,10 @@
+/**
+* File: worker.mjs
+* Purpose: ES Module entry wrapper adapting CommonJS Express app for
+*          Cloudflare Workers deployment via httpServerHandler
+* Dependencies: server.js
+*/
+
 // compatability file telling node/wrangler its an es module
 import { httpServerHandler } from 'cloudflare:node';
 import server from './server.js';
