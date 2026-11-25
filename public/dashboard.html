@@ -16,7 +16,7 @@
       <div class="account-controls">
         <a class="dashboard-login-button" id="dashboardLoginButton" href="Login_updated.html">Log in</a>
         <span class="username" id="dashboardUsername" hidden></span>
-
+        <!-- Avatar menu for account actions -->
         <div class="avatar-menu-container">
           <button class="avatar avatar-button" id="avatarMenuButton" type="button"
                   aria-label="Open account menu" aria-haspopup="true"
@@ -26,6 +26,7 @@
               <path d="M4.5 21c.5-4.1 3.3-6.5 7.5-6.5s7 2.4 7.5 6.5"></path>
             </svg>
           </button>
+          <!-- Dropdown menu for avatar actions -->
           <div class="avatar-dropdown" id="avatarDropdown" hidden>
             <div class="dropdown-account" id="dropdownAccount">Not signed in</div>
             <button type="button" id="dropdownLoginButton">Log in</button>
@@ -33,9 +34,10 @@
           </div>
         </div>
       </div>
+      <!-- Display the current date -->
       <div class="date" id="todayDate"></div>
     </header>
-
+    <!-- Sidebar for events and add event controls -->
     <aside class="sidebar" aria-label="Calendar events">
       <section class="sidebar-events" aria-labelledby="sidebarEventsHeading">
         <h2 id="sidebarEventsHeading">Events</h2>
@@ -52,7 +54,7 @@
           <form id="eventForm">
             <label for="eventTitle">Event name</label>
             <input id="eventTitle" name="title" type="text" maxlength="120" required>
-
+            <!-- Date and time inputs for the event -->
             <label for="eventDate">Date</label>
             <input id="eventDate" name="date" type="date" required>
 
@@ -65,11 +67,9 @@
             <label for="eventDescription">Description</label>
             <textarea id="eventDescription" name="description" rows="3" maxlength="1000"></textarea>
 
-            <label for="eventCategory">Color</label>
-            <select id="eventCategory" name="category">
-              <option value="blue">Blue</option>
-              <option value="red">Red</option>
-              <option value="yellow">Yellow</option>
+            <label for="eventCategory">Category</label>
+            <select id="eventCategory" name="cID">
+              <option value="">No category</option>
             </select>
     <!-- Event form actions --> 
             <p class="event-form-message" id="eventFormMessage" role="status" aria-live="polite"></p>
@@ -81,7 +81,7 @@
         </section>
       </div>
     </aside>
-
+    <!-- Main calendar workspace -->
     <section class="workspace" aria-label="Calendar">
       <div id="calendar"></div>
     </section>
@@ -104,10 +104,24 @@
     const dropdownLoginButton = document.getElementById('dropdownLoginButton');
     const dropdownLogoutButton = document.getElementById('dropdownLogoutButton');
 
+    function getLoggedInUID() {
+      // The login page should save the database User.uID after successful login.
+      return sessionStorage.getItem('loggedInUID')
+        || sessionStorage.getItem('loggedInUserID')
+        || sessionStorage.getItem('uID')
+        || '';
+    }
+
     function updateAccountDisplay() {
       const email = sessionStorage.getItem('loggedInEmail');
-
+      const uID = getLoggedInUID();
+// If the user is logged in, show their email and account options; otherwise, show the login button.
       if (email) {
+        if (uID) {
+          console.info('Signed-in database uID:', uID);
+        } else {
+          console.warn('Signed-in email found, but no database uID is stored. Update the login page to save loggedInUID.');
+        }
         loginButton.hidden = true;
         dashboardUsername.hidden = false;
         dashboardUsername.textContent = email;
@@ -123,7 +137,7 @@
         dropdownLogoutButton.hidden = true;
       }
     }
-
+// Position the avatar dropdown menu relative to the avatar button, ensuring it stays within the viewport.
     function positionAvatarDropdown() {
       const buttonRect = avatarMenuButton.getBoundingClientRect();
       const margin = 12;
@@ -146,7 +160,7 @@
       avatarDropdown.style.top = `${top}px`;
       avatarDropdown.style.width = `${menuWidth}px`;
     }
-
+// Toggle the visibility of the avatar dropdown menu and update ARIA attributes accordingly.
     function setAvatarMenuOpen(open) {
       avatarDropdown.hidden = !open;
       avatarMenuButton.setAttribute('aria-expanded', String(open));
@@ -155,7 +169,8 @@
         positionAvatarDropdown();
       }
     }
-
+    // Update the account display when the page loads.
+    updateAccountDisplay();
     window.addEventListener('resize', () => {
       if (!avatarDropdown.hidden) positionAvatarDropdown();
     });
@@ -172,7 +187,7 @@
     document.addEventListener('click', (event) => {
       if (!event.target.closest('.avatar-menu-container')) setAvatarMenuOpen(false);
     });
-
+// Close the avatar dropdown when the Escape key is pressed, and return focus to the avatar button.
     document.addEventListener('keydown', (event) => {
       if (event.key === 'Escape' && !avatarDropdown.hidden) {
         setAvatarMenuOpen(false);
@@ -183,7 +198,7 @@
     dropdownLoginButton.addEventListener('click', () => {
       window.location.href = loginButton.href;
     });
-
+// Clear the session storage and redirect to the login page when the user logs out.
     dropdownLogoutButton.addEventListener('click', () => {
       sessionStorage.removeItem('loggedInEmail');
       setAvatarMenuOpen(false);
@@ -191,7 +206,7 @@
     });
 
     updateAccountDisplay();
-
+// Store the logged-in user's database uID in sessionStorage for later use.
     const eventForm = document.getElementById('eventForm');
     const eventFormMessage = document.getElementById('eventFormMessage');
     const cancelEvent = document.getElementById('cancelEvent');
@@ -279,10 +294,36 @@
         eventList.appendChild(eventButton);
       });
     }
+    // Load the user's categories. The API should return Category columns:
+    // cID, name, and colorCat.
+    const eventCategorySelect = document.getElementById('eventCategory');
+    const categoryColors = new Map();
+
+    async function loadCategories() {
+      try {
+        const response = await fetch('http://localhost:3000/api/categories', {
+          credentials: 'include'
+        });
+        if (!response.ok) throw new Error('Categories could not be loaded.');
+        const categories = await response.json();
+
+        categories.forEach((category) => {
+          const option = document.createElement('option');
+          option.value = category.cID;
+          option.textContent = category.name;
+          eventCategorySelect.appendChild(option);
+          categoryColors.set(String(category.cID), category.colorCat || '#303fe8');
+        });
+      } catch (error) {
+        console.warn(error.message);
+        // Events can still be saved without a category (cID = NULL).
+      }
+    }
+
     // Initialize the calendar.
     const calendar = new FullCalendar.Calendar(document.getElementById('calendar'), {
       initialView: 'dayGridMonth',
-      initialDate: '2026-10-01',
+      initialDate: new Date(),
       headerToolbar: {
         left: 'prev,next today',
         center: 'title',
@@ -290,28 +331,39 @@
       },
       events: async (info, successCallback, failureCallback) => {
         try {
-          const email = sessionStorage.getItem('loggedInEmail');
-          const response = await fetch(
-            `http://localhost:3000/api/events?email=${encodeURIComponent(email || '')}`
-          );
-          if (!response.ok) throw new Error('Could not load saved events.');
+          const response = await fetch('http://localhost:3000/api/events', {
+            credentials: 'include'
+          });
+          if (!response.ok) throw new Error('Could not load saved events. Make sure you are signed in and the server supports GET /api/events.');
           const rows = await response.json();
-          successCallback(rows.map((item) => ({
-            id: item.id,
-            title: item.title,
-            start: item.start,
-            end: item.end || undefined,
-            allDay: item.allDay ?? (!item.startTime),
-            extendedProps: {
-              description: item.description || '',
-              category: item.category || 'blue'
-            },
-            backgroundColor: item.category === 'red' ? '#f02e32' :
-              item.category === 'yellow' ? '#f1ed2d' : '#303fe8',
-            borderColor: item.category === 'red' ? '#f02e32' :
-              item.category === 'yellow' ? '#f1ed2d' : '#303fe8',
-            textColor: item.category === 'yellow' ? '#303030' : '#ffffff'
-          })));
+
+          successCallback(rows.map((item) => {
+            // These names match the Event and Category columns in dbserver.js.
+            const startValue = String(item.startT || '').replace(' ', 'T');
+            const endValue = String(item.endT || '').replace(' ', 'T');
+            const categoryColor = item.colorCat || '#303fe8';
+            const isAllDay = /^\\d{4}-\\d{2}-\\d{2}$/.test(String(item.startT || ''));
+
+            return {
+              id: item.eID,
+              title: item.title,
+              start: startValue,
+              end: endValue || undefined,
+              allDay: isAllDay,
+              backgroundColor: categoryColor,
+              borderColor: categoryColor,
+              textColor: categoryColor.toLowerCase() === '#f1ed2d' ? '#303030' : '#ffffff',
+              extendedProps: {
+                uID: item.uID,
+                cID: item.cID,
+                description: item.desc || '',
+                recurring: Boolean(item.recurring),
+                location: item.location || '',
+                doneE: Boolean(item.doneE),
+                categoryName: item.categoryName || ''
+              }
+            };
+          }));
         } catch (error) {
           console.error(error);
           failureCallback(error);
@@ -319,8 +371,9 @@
       },
       eventsSet: renderSidebarEvents
     });
-    // Render the calendar.
+    // Render the calendar and load the user's database categories.
     calendar.render();
+    loadCategories();
 
     eventForm.addEventListener('submit', async (event) => {
       event.preventDefault();
@@ -332,11 +385,13 @@
       const startTime = String(formData.get('startTime') || '');
       const endTime = String(formData.get('endTime') || '');
       const description = String(formData.get('description') || '').trim();
-      const category = String(formData.get('category') || 'blue');
-      const email = sessionStorage.getItem('loggedInEmail');
-      // Check if the user is logged in.
-      if (!email) {
-        eventFormMessage.textContent = 'Please log in again before saving an event.';
+      const cIDValue = String(formData.get('cID') || '');
+      const cID = cIDValue ? Number(cIDValue) : null;
+      const uID = getLoggedInUID();
+
+      // The server must verify the session and assign Event.uID itself.
+      if (!sessionStorage.getItem('loggedInEmail') || !uID) {
+        eventFormMessage.textContent = 'Please sign in again. Your login must save the database user ID.';
         return;
       }
 
@@ -347,8 +402,11 @@
       }
 
       const allDay = !startTime;
-      const start = allDay ? date : `${date}T${startTime}:00`;
-      const end = endTime ? `${date}T${endTime}:00` : null;
+      const startT = allDay ? `${date}T00:00:00` : `${date}T${startTime}:00`;
+      // Event.endT is NOT NULL in the SQLite schema.
+      const endT = endTime
+        ? `${date}T${endTime}:00`
+        : (allDay ? `${date}T23:59:59` : startT);
 
       saveEventButton.disabled = true;
       saveEventButton.textContent = 'Saving...';
@@ -357,39 +415,52 @@
         // The backend should insert this JSON into its events table and return the saved event.
         const response = await fetch('http://localhost:3000/api/events', {
           method: 'POST',
+          credentials: 'include',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            email,
             title,
-            start,
-            end,
-            allDay,
-            description,
-            category
+            desc: description,
+            startT,
+            endT,
+            cID,
+            recurring: false,
+            location: null
           })
         });
-
+// The API should return the inserted Event row using its database names.
         const result = await response.json().catch(() => ({}));
         if (!response.ok) {
-          throw new Error(result.message || 'The event could not be saved.');
+          throw new Error(result.message || result.error || 'The event could not be saved.');
         }
-        // Add the saved event to the calendar.
-        const savedEvent = result.event || result;
-        calendar.addEvent({
-          id: savedEvent.id,
-          title,
-          start,
-          end: end || undefined,
-          allDay,
-          backgroundColor: category === 'red' ? '#f02e32' :
-            category === 'yellow' ? '#f1ed2d' : '#303fe8',
-          borderColor: category === 'red' ? '#f02e32' :
-            category === 'yellow' ? '#f1ed2d' : '#303fe8',
-          textColor: category === 'yellow' ? '#303030' : '#ffffff',
-          extendedProps: { description, category }
-        });
 
+        // The API should return the inserted Event row using its database names.
+        const savedEvent = result.event || result;
+        const savedCID = savedEvent.cID ?? cID;
+        const categoryColor = categoryColors.get(String(savedCID)) || '#303fe8';
+        const savedStart = String(savedEvent.startT || startT).replace(' ', 'T');
+        const savedEnd = String(savedEvent.endT || endT).replace(' ', 'T');
+// Add the saved event to the calendar with the appropriate properties.
+        calendar.addEvent({
+          id: savedEvent.eID,
+          title: savedEvent.title || title,
+          start: savedStart,
+          end: savedEnd,
+          allDay,
+          backgroundColor: categoryColor,
+          borderColor: categoryColor,
+          textColor: categoryColor.toLowerCase() === '#f1ed2d' ? '#303030' : '#ffffff',
+          extendedProps: {
+            uID: savedEvent.uID || uID,
+            cID: savedCID,
+            description: savedEvent.desc || description,
+            recurring: Boolean(savedEvent.recurring),
+            location: savedEvent.location || '',
+            doneE: Boolean(savedEvent.doneE)
+          }
+        });
+// Reset the form and show a success message.
         eventForm.reset();
+        // Close the form after a short delay to allow the user to see the success message.
         eventFormMessage.textContent = 'Event saved successfully.';
         setTimeout(() => {
           eventFormMessage.textContent = '';

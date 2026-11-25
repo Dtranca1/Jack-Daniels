@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+<!-- The following HTML file represents a login page for a web application. It includes a form for users to enter their email and password, and it uses JavaScript to handle the form submission and communicate with the server for authentication. -->
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -51,13 +52,13 @@
             </a>
         </p>
     </footer>
-
+// The following script handles the login form submission, sending the email and password to the server for authentication. It also manages the UI feedback during the login process.
     <script>
         const loginForm = document.getElementById("login");
 
         loginForm.addEventListener("submit", async function (event) {
             event.preventDefault();
-
+// Retrieve the email and password values from the form inputs, trimming whitespace from the email.
             const email = document.getElementById("email").value.trim();
             const password = document.getElementById("password").value;
             const submitButton = document.getElementById("submit");
@@ -66,7 +67,7 @@
             message.textContent = "";
             submitButton.disabled = true;
             submitButton.value = "Logging in...";
-
+// The fetch request is sent to the server's login endpoint, and the response is handled accordingly. If the login is successful, the user is redirected to the dashboard, and their email is stored in sessionStorage. If there's an error, an appropriate message is displayed.
             try {
                 const response = await fetch("http://localhost:3000/api/auth/login", {
                     method: "POST",
@@ -95,6 +96,8 @@
                 submitButton.value = "Login";
             }
         });
+        sessionStorage.setItem('loggedInUID', user.uID);
+        sessionStorage.setItem('loggedInEmail', user.email);
     </script>
 </body>
 </html>
