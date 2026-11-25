@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+    <!-- The following HTML file represents a registration page for a web application. It includes a form for users to create an account by entering their first name, last name, email, and password. JavaScript is used to handle the form submission, validate the input, and communicate with the server for account creation. -->
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,7 +13,7 @@
         <h1>Webapp</h1>
         <p>Create an account to get started.</p>
     </header>
-
+<!-- The main section of the page contains a registration form where users can input their personal information to create an account. The form includes fields for first name, last name, email, password, and password confirmation. It also provides links for users who already have an account to log in. -->
     <main>
         <section>
             <form id="registration" name="registration">
@@ -25,7 +26,7 @@
                                size="30" placeholder="First Name"
                                autocomplete="firstName" required>
                     </p>
-
+                <!-- The following script handles the registration form submission, sending the user's input to the server for account creation. It includes validation to ensure that the passwords match and provides feedback to the user based on the server's response. -->
                     <p>
                         <label for="lName">Last Name:</label><br>
                         <input type="lName" name="lName" id="lName"
@@ -55,7 +56,7 @@
                                autocomplete="new-password"
                                minlength="8" required>
                     </p>
-
+<!-- The form includes a submit button for users to register and a reset button to clear the form fields. It also provides a link for users who already have an account to navigate to the login page. Feedback messages are displayed to inform users of the registration status or any errors encountered during the process. -->
                     <p>
                         <input id="submit" type="submit" value="Register">
                         <input id="reset-button" type="reset" value="Reset">
@@ -82,7 +83,7 @@
         registrationForm.addEventListener("submit", async function (event) {
             event.preventDefault();
 
-
+// Retrieve the values from the form inputs, trimming whitespace from the first name, last name, and email.
             const fName = document.getElementById("fName").value.trim();
             const lName = document.getElementById("lName").value.trim();
             const email = document.getElementById("email").value.trim();
@@ -92,13 +93,13 @@
             const message = document.getElementById("form-message");
 
             message.textContent = "";
-
+// Check if the password and confirm password fields match. If they don't, display an error message and focus on the confirm password field.
             if (password !== confirmPassword) {
                 message.textContent = "The passwords do not match.";
                 document.getElementById("confirm-password").focus();
                 return;
             }
-
+// Disable the submit button and change its text to indicate that the registration process is in progress.
             submitButton.disabled = true;
             submitButton.value = "Registering...";
 
@@ -117,7 +118,7 @@
                 });
 
                 const result = await response.json().catch(() => ({}));
-
+// If the response is not OK, throw an error with the message from the server or a default message.
                 if (!response.ok) {
                     throw new Error(result.message || "Registration failed. Please try again.");
                 }
