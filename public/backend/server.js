@@ -43,4 +43,4 @@ if (!process.env.WORKERS_RUNTIME) {
     });
 }
 
-export default httpServerHandler({ port: PORT });
+module.exports = { app, PORT };
