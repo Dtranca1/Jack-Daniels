@@ -300,12 +300,14 @@
     const categoryColors = new Map();
 
     async function loadCategories() {
+      const uID = getLoggedInUID();
+      if (!uID) return;
+      
       try {
-        const response = await fetch('http://localhost:3000/api/categories', {
-          credentials: 'include'
-        });
+        const response = await fetch(`http://localhost:3000/api/categories/${uID}`);
         if (!response.ok) throw new Error('Categories could not be loaded.');
-        const categories = await response.json();
+        const data = await response.json();
+        const categories = data.categories || [];
 
         categories.forEach((category) => {
           const option = document.createElement('option');
@@ -330,12 +332,18 @@
         right: 'dayGridMonth,timeGridWeek,listWeek'
       },
       events: async (info, successCallback, failureCallback) => {
+
+        const uID = getLoggedInUID();
+        if (!uID) {
+          successCallback([]);
+          return;
+        }
+
         try {
-          const response = await fetch('http://localhost:3000/api/events', {
-            credentials: 'include'
-          });
+          const response = await fetch(`http://localhost:3000/api/events/${uID}`);
           if (!response.ok) throw new Error('Could not load saved events. Make sure you are signed in and the server supports GET /api/events.');
-          const rows = await response.json();
+          const data = await response.json();
+          const rows = data.events || [];
 
           successCallback(rows.map((item) => {
             // These names match the Event and Category columns in dbserver.js.
@@ -413,11 +421,11 @@
 
       try {
         // The backend should insert this JSON into its events table and return the saved event.
-        const response = await fetch('http://localhost:3000/api/events', {
+        const response = await fetch('http://localhost:3000/api/events/create', {
           method: 'POST',
-          credentials: 'include',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
+            uID: Number(uID),
             title,
             desc: description,
             startT,
