@@ -312,7 +312,10 @@
     gap: 7px;
 }
 /* Style the labels for the form fields */
-#eventForm label {
+#eventForm label,
+#categoryForm label,
+#taskForm label,
+#reminderForm label {
     margin-top: 5px;
     color: #303030;
     font-size: 13px;
@@ -321,7 +324,16 @@
 /* Style the input, textarea, and select elements inside the form */
 #eventForm input,
 #eventForm textarea,
-#eventForm select {
+#eventForm select,
+#categoryForm input,
+#categoryForm textarea,
+#categoryForm select,
+#taskForm input,
+#taskForm textarea,
+#taskForm select,
+#reminderForm input,
+#reminderForm textarea,
+#reminderForm select {
     width: 100%;
     min-width: 0;
     padding: 8px 9px;
@@ -332,7 +344,10 @@
     font: 14px Arial, sans-serif;
 }
 
-#eventForm textarea { resize: vertical; }
+#eventForm textarea,
+#categoryForm textarea,
+#taskForm textarea,
+#reminderForm textarea { resize: vertical; }
 /* Style the action buttons for the form */
 .event-form-actions {
     display: flex;
@@ -491,3 +506,13 @@
         font-size: 13px;
     }
 }
+
+/* Create menu choices and forms (Event, Category, Task, Reminder) */
+.create-menu { width: min(300px, calc(100vw - 110px)); max-height: min(78vh, 620px); overflow-y: auto; }
+    .create-menu h2 { margin: 0 0 12px; }
+    .create-choice { display:block; width:100%; margin:7px 0; padding:11px 14px; border:1px solid #d5d5d5; border-radius:8px; background:#fff; color:#222; text-align:left; font:inherit; cursor:pointer; }
+    .create-choice:hover, .create-choice:focus-visible { background:#f0f1ff; border-color:#303fe8; }
+    .create-form-panel[hidden], #createChoices[hidden] { display:none !important; }
+    .create-back { margin:0 0 10px; padding:5px 9px; border:0; border-radius:6px; background:#eee; cursor:pointer; }
+    .create-form-panel input:not([type="color"]), .create-form-panel select, .create-form-panel textarea { box-sizing:border-box; width:100%; margin:4px 0 10px; }
+    .create-form-panel input[type="color"] { display:block; width:54px; height:36px; margin:4px 0 10px; }

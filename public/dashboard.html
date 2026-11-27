@@ -8,7 +8,18 @@
   <link href="../public/css/bootstrap.min.css" rel="stylesheet">
   <link href="../public/css/dashboard-styles.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
-</head>
+
+  <style>
+    .create-menu { width: min(300px, calc(100vw - 110px)); max-height: min(78vh, 620px); overflow-y: auto; }
+    .create-menu h2 { margin: 0 0 12px; }
+    .create-choice { display:block; width:100%; margin:7px 0; padding:11px 14px; border:1px solid #d5d5d5; border-radius:8px; background:#fff; color:#222; text-align:left; font:inherit; cursor:pointer; }
+    .create-choice:hover, .create-choice:focus-visible { background:#f0f1ff; border-color:#303fe8; }
+    .create-form-panel[hidden], #createChoices[hidden] { display:none !important; }
+    .create-back { margin:0 0 10px; padding:5px 9px; border:0; border-radius:6px; background:#eee; cursor:pointer; }
+    .create-form-panel input:not([type="color"]), .create-form-panel select, .create-form-panel textarea { box-sizing:border-box; width:100%; margin:4px 0 10px; }
+    .create-form-panel input[type="color"] { display:block; width:54px; height:36px; margin:4px 0 10px; }
+  </style>
+\n</head>
 <body>
   <!-- Dashboard content -->
   <main class="dashboard" aria-label="Calendar dashboard">
@@ -49,8 +60,18 @@
       <div class="add-control">
         <button class="add-button btn p-0" id="addToggle" type="button"
           aria-label="Open create menu" aria-expanded="false" aria-controls="addMenu"></button>
-        <section class="add-menu" id="addMenu" aria-labelledby="eventFormHeading" aria-hidden="true">
+        <section class="add-menu create-menu" id="addMenu" aria-label="Create new item" aria-hidden="true">
+          <div id="createChoices">
+            <h2>Create new</h2>
+            <button type="button" class="create-choice" data-create-type="event">Event</button>
+            <button type="button" class="create-choice" data-create-type="category">Category</button>
+            <button type="button" class="create-choice" data-create-type="task">Task</button>
+            <button type="button" class="create-choice" data-create-type="reminder">Reminder</button>
+          </div>
+
+          <div class="create-form-panel" id="eventCreatePanel" hidden>
           <h2 id="eventFormHeading">New event</h2>
+          <button type="button" class="create-back" data-create-back>← Back</button>
           <form id="eventForm">
             <label for="eventTitle">Event name</label>
             <input id="eventTitle" name="title" type="text" maxlength="120" required>
@@ -78,6 +99,61 @@
               <button type="submit" class="event-submit" id="saveEvent">Save event</button>
             </div>
           </form>
+          </div>
+
+          <div class="create-form-panel" id="categoryCreatePanel" hidden>
+            <h2>New category</h2>
+            <button type="button" class="create-back" data-create-back>← Back</button>
+            <form id="categoryForm">
+              <label for="categoryName">Category name</label>
+              <input id="categoryName" name="name" type="text" maxlength="80" required>
+              <label for="categoryColor">Category color</label>
+              <input id="categoryColor" name="colorCat" type="color" value="#303fe8">
+              <p class="event-form-message" id="categoryFormMessage" role="status"></p>
+              <div class="event-form-actions">
+                <button type="button" class="event-cancel" data-create-back>Cancel</button>
+                <button type="submit" class="event-submit">Save category</button>
+              </div>
+            </form>
+          </div>
+
+          <div class="create-form-panel" id="taskCreatePanel" hidden>
+            <h2>New task</h2>
+            <button type="button" class="create-back" data-create-back>← Back</button>
+            <form id="taskForm">
+              <label for="taskTitle">Task name</label>
+              <input id="taskTitle" name="title" type="text" maxlength="120" required>
+              <label for="taskDescription">Description</label>
+              <textarea id="taskDescription" name="desc" rows="3" maxlength="1000"></textarea>
+              <label for="taskDueDate">Due date</label>
+              <input id="taskDueDate" name="dueT" type="date">
+              <label for="taskCategory">Category</label>
+              <select id="taskCategory" name="cID"><option value="">No category</option></select>
+              <p class="event-form-message" id="taskFormMessage" role="status"></p>
+              <div class="event-form-actions">
+                <button type="button" class="event-cancel" data-create-back>Cancel</button>
+                <button type="submit" class="event-submit">Save task</button>
+              </div>
+            </form>
+          </div>
+
+          <div class="create-form-panel" id="reminderCreatePanel" hidden>
+            <h2>New reminder</h2>
+            <button type="button" class="create-back" data-create-back>← Back</button>
+            <form id="reminderForm">
+              <label for="reminderTitle">Reminder</label>
+              <input id="reminderTitle" name="title" type="text" maxlength="120" required>
+              <label for="reminderDateTime">Reminder date and time</label>
+              <input id="reminderDateTime" name="remindT" type="datetime-local" required>
+              <label for="reminderDescription">Description</label>
+              <textarea id="reminderDescription" name="desc" rows="3" maxlength="1000"></textarea>
+              <p class="event-form-message" id="reminderFormMessage" role="status"></p>
+              <div class="event-form-actions">
+                <button type="button" class="event-cancel" data-create-back>Cancel</button>
+                <button type="submit" class="event-submit">Save reminder</button>
+              </div>
+            </form>
+          </div>
         </section>
       </div>
     </aside>
@@ -207,6 +283,93 @@
 
     updateAccountDisplay();
 // Store the logged-in user's database uID in sessionStorage for later use.
+    const createChoices = document.getElementById('createChoices');
+    const createPanels = {
+      event: document.getElementById('eventCreatePanel'),
+      category: document.getElementById('categoryCreatePanel'),
+      task: document.getElementById('taskCreatePanel'),
+      reminder: document.getElementById('reminderCreatePanel')
+    };
+
+    function showCreateChoice() {
+      Object.values(createPanels).forEach(panel => panel.hidden = true);
+      createChoices.hidden = false;
+      addMenu.setAttribute('aria-label', 'Create new item');
+    }
+
+    function showCreatePanel(type) {
+      createChoices.hidden = true;
+      Object.entries(createPanels).forEach(([name, panel]) => {
+        panel.hidden = name !== type;
+      });
+      const firstInput = createPanels[type]?.querySelector('input, select, textarea');
+      if (firstInput) firstInput.focus();
+    }
+
+    document.querySelectorAll('[data-create-type]').forEach(button => {
+      button.addEventListener('click', () => showCreatePanel(button.dataset.createType));
+    });
+    document.querySelectorAll('[data-create-back]').forEach(button => {
+      button.addEventListener('click', showCreateChoice);
+    });
+
+    const categoryForm = document.getElementById('categoryForm');
+    const taskForm = document.getElementById('taskForm');
+    const reminderForm = document.getElementById('reminderForm');
+
+    async function submitNewItem(form, endpoint, messageElement, successText) {
+      const uID = getLoggedInUID();
+      if (!sessionStorage.getItem('loggedInEmail') || !uID) {
+        messageElement.textContent = 'Please sign in again. Your login must save the database user ID.';
+        return;
+      }
+      const submitButton = form.querySelector('button[type="submit"]');
+      submitButton.disabled = true;
+      const oldText = submitButton.textContent;
+      submitButton.textContent = 'Saving...';
+      const values = Object.fromEntries(new FormData(form).entries());
+      if ('cID' in values) values.cID = values.cID ? Number(values.cID) : null;
+      try {
+        const response = await fetch(`http://localhost:3000${endpoint}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ...values, uID: Number(uID) })
+        });
+        const result = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(result.message || result.error || 'Could not save this item.');
+        messageElement.textContent = successText;
+        form.reset();
+        if (form === categoryForm) {
+          await loadCategories();
+        }
+        setTimeout(() => {
+          messageElement.textContent = '';
+          showCreateChoice();
+        }, 900);
+      } catch (error) {
+        messageElement.textContent = `${error.message} Check that the server has ${endpoint}.`;
+      } finally {
+        submitButton.disabled = false;
+        submitButton.textContent = oldText;
+      }
+    }
+
+    categoryForm.addEventListener('submit', event => {
+      event.preventDefault();
+      submitNewItem(categoryForm, '/api/categories/create',
+        document.getElementById('categoryFormMessage'), 'Category saved.');
+    });
+    taskForm.addEventListener('submit', event => {
+      event.preventDefault();
+      submitNewItem(taskForm, '/api/tasks/create',
+        document.getElementById('taskFormMessage'), 'Task saved.');
+    });
+    reminderForm.addEventListener('submit', event => {
+      event.preventDefault();
+      submitNewItem(reminderForm, '/api/reminders/create',
+        document.getElementById('reminderFormMessage'), 'Reminder saved.');
+    });
+
     const eventForm = document.getElementById('eventForm');
     const eventFormMessage = document.getElementById('eventFormMessage');
     const cancelEvent = document.getElementById('cancelEvent');
@@ -215,6 +378,7 @@
     function setEventFormOpen(open) {
       addMenu.classList.toggle('show', open);
       addMenu.setAttribute('aria-hidden', String(!open));
+      if (open) showCreateChoice();
       addToggle.setAttribute('aria-expanded', String(open));
       if (open) document.getElementById('eventTitle').focus();
     }
@@ -297,6 +461,7 @@
     // Load the user's categories. The API should return Category columns:
     // cID, name, and colorCat.
     const eventCategorySelect = document.getElementById('eventCategory');
+    const taskCategorySelect = document.getElementById('taskCategory');
     const categoryColors = new Map();
 
     async function loadCategories() {
@@ -308,12 +473,16 @@
         if (!response.ok) throw new Error('Categories could not be loaded.');
         const data = await response.json();
         const categories = data.categories || [];
+        eventCategorySelect.replaceChildren(new Option('No category', ''));
+        taskCategorySelect.replaceChildren(new Option('No category', ''));
 
         categories.forEach((category) => {
-          const option = document.createElement('option');
-          option.value = category.cID;
-          option.textContent = category.name;
-          eventCategorySelect.appendChild(option);
+          [eventCategorySelect, taskCategorySelect].forEach(select => {
+            const option = document.createElement('option');
+            option.value = category.cID;
+            option.textContent = category.name;
+            select.appendChild(option);
+          });
           categoryColors.set(String(category.cID), category.colorCat || '#303fe8');
         });
       } catch (error) {
