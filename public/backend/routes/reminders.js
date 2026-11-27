@@ -7,7 +7,7 @@
 
 const express = require('express');
 const router = express.Router();
-const db = require('../../../dbserver'); // import sqlite database connection instance
+const db = require('../dbserver'); // import sqlite database connection instance
 
 /**
  * @route   GET /api/reminders/:uID

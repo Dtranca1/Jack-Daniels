@@ -5,7 +5,7 @@
  */
 
 const express = require('express');
-const db = require('../../dbserver'); // import sqlite database connection instance
+const db = require('./dbserver'); // import sqlite database connection instance
 const cors = require('cors');
 const authRoutes = require('./routes/auth'); // auth route 
 const taskRoutes = require('./routes/tasks'); // task route
@@ -42,11 +42,9 @@ app.get('/', (req, res) => {
     res.json({ message: "API is running successfully!" });
 });
 
-// Replaced app.listen(...) with conditional local listen + Worker handler export
-if (!process.env.WORKERS_RUNTIME) {
-    app.listen(PORT, () => {
-        console.log(`Server is running on port ${PORT}`);
-    });
-}
+// starts the server for Railway or local use
+app.listen(PORT, "0.0.0.0", () => {
+    console.log(`Server is running on port ${PORT}`);
+});
 
-module.exports = { app, PORT };
+module.exports = { app, db };

@@ -8,7 +8,7 @@
 const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcrypt');
-const db = require('../../../dbserver'); // import sqlite database connection instance
+const db = require('../dbserver'); // import sqlite database connection instance
 
 /**
  * @route   POST /api/auth/register

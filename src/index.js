@@ -4,13 +4,11 @@ export default {
         // gets info about the current URL being visited
         const url = new URL(request.url);
 
-        // makes dashboard.html the root page
+        // sends the root domain to the dashboard
         if (url.pathname === "/") {
-            return env.ASSETS.fetch(
-                new Request(
-                    new URL("/dashboard.html", request.url),
-                    request
-                )
+            return Response.redirect(
+                new URL("/dashboard", request.url).toString(),
+                302
             );
         }
 
